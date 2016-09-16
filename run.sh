@@ -6,7 +6,7 @@ cat <<HERE
         "description": "tab title",
         "messages": [{
             "format": "code",
-            "content": "asdf\\nasdf\\nasdf"
+            "description": "asdf\\nasdf\\nasdf"
         }],
         "groups": [{
             "accepted": false,
