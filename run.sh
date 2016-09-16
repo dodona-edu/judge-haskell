@@ -26,7 +26,7 @@ cat <<HERE
                 "groups": [{
                     "accepted": true,
                     "decription": "ggd 12 4",
-                    "generated": "4",
+                    "generated": "4"
                 }]
             }]
         }]
