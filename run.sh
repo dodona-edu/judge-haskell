@@ -1,7 +1,7 @@
 #!/bin/bash
 
-input="$(cat | base64)"
-env="$(ls | base64)"
+input="$(cat | base64 | tr -d "\n")"
+env="$(ls | base64 | tr -d "\n")"
 
 cat <<HERE
 {
