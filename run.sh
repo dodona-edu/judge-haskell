@@ -7,17 +7,22 @@ touch "Input.hs"
 echo "module Input where" >  "Input.hs"
 cat "$SOURCE" >>  "Input.hs" 
 cp  $(echo "$RESOURCES"/*_test.hs)  . 
-OUTPUT="$(runghc *_test.hs 2> /dev/null)"
+output="$(runghc *_test.hs 2> stderr.file)"
+errput="$(cat stderr.file | base64 | tr -d '\n')"
 
 cat <<HERE
 {
     "accepted": false,
     "description": "failed :-(",
-    "status": "helaas onsuccesvol",
+    "status": "wrong",
+    "messages": [{
+        "description": "$errput",
+        "format": "code"
+    }]
     "groups": [{
         "accepted": false,
         "description": "tab title",
-        "groups": $OUTPUT    
+        "groups": ${output:-[]}
      }]
 }
 HERE
