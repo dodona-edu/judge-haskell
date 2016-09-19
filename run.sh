@@ -18,11 +18,11 @@ cat <<HERE
     "messages": [{
         "description": "$errput",
         "format": "code"
-    }]
+    }],
     "groups": [{
         "accepted": false,
         "description": "tab title",
         "groups": ${output:-[]}
-     }]
+    }]
 }
 HERE
