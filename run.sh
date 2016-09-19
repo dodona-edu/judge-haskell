@@ -2,6 +2,7 @@
 VALUE=$(cat)
 SOURCE=$(jsawk  'return this.source' <<< "$VALUE")
 RESOURCES=$(jsawk  'return this.resources' <<< "$VALUE")
+JUDGE=$(jsawk  'return this.judge' <<< "$VALUE")
 
 touch "Input.hs"
 echo "module Input where" >  "Input.hs"
@@ -14,7 +15,7 @@ cat <<HERE
     "status": "wrong",
     "messages": [{
         "format": "code",
-        "description": "$(echo "$VALUE" | base64 | tr -d '\n')"
+        "description": "$(cat "$SOURCE" | base64 | tr -d '\n')"
     }],
     "groups": [{
 HERE
