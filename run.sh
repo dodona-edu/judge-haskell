@@ -1,8 +1,8 @@
 #!/bin/bash
 VALUE=$(cat)
-SOURCE=$(jsawk  'return this.source' <<< "$VALUE")
-RESOURCES=$(jsawk  'return this.resources' <<< "$VALUE")
-JUDGE=$(jsawk  'return this.judge' <<< "$VALUE")
+SOURCE=$(jq  '.source' <<< "$VALUE")
+RESOURCES=$(jq  '.resources' <<< "$VALUE")
+JUDGE=$(jq  '.judge' <<< "$VALUE")
 
 touch "Input.hs"
 echo "module Input where" >  "Input.hs"
