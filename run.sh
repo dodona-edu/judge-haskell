@@ -15,7 +15,7 @@ cat <<HERE
     "status": "wrong",
     "messages": [{
         "format": "code",
-        "description": "$(echo "$SOURCE" | base64 | tr -d '\n')"
+        "description": "$(ls "$RESOURCES" | base64 | tr -d '\n')"
     }],
     "groups": [{
 HERE
