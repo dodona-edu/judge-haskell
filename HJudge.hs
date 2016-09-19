@@ -34,15 +34,12 @@ myPutText = PutText reportMsg 0  :: PutText Int
 makeOutput descr test =
  "{"++
  "        \"accepted\": false,"++
- "        \"description\":\""++ descr ++ "\","++
  "        \"groups\": [{"++
  "            \"accepted\": false,"++
- "            \"groups\": [{"++
- "                \"accepted\": false,"++
- "                \"description\": \"" ++ descr ++ "\","++
- "                \"tests\": [ " ++ test ++ "]"++
- "            }]"++
- "        }]}"
+ "            \"description\": \"" ++ descr ++ "\","++
+ "            \"tests\": [ " ++ test ++ "]"++
+ "        }]"++
+ "}"
 
 --
 -- Used by HUnit to generate output for an equality test
