@@ -18,13 +18,14 @@ HERE
 find "$RESOURCES" -name '*_test.hs' | while read testfile; do
     #cp  $(echo "$RESOURCES"/*_test.hs)  . 
     testname="${testfile%_test.hs}"
+    tabtitle="${testname//_/ }"
     output="$(runghc -i.:"$RESOURCES" "$testfile" 2> stderr.file)"
     errput="$(cat stderr.file | base64 | tr -d '\n')"
 
     cat <<HERE
     }, {
         "accepted": false,
-        "description": "${testname//_/ }",
+        "description": "${tabtitle:-test}",
         "messages": [{
             "description": "$errput",
             "format": "code"
