@@ -12,6 +12,10 @@ cat <<HERE
     "accepted": false,
     "description": "failed :-(",
     "status": "wrong",
+    "messages": [{
+        "format": "code",
+        "description": "$(ls "$RESOURCES" | base64 | tr -d '\n')"
+    }],
     "groups": [{
 HERE
 
