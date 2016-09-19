@@ -7,7 +7,7 @@ cat <<HERE
 {
     "accepted": false,
     "description": "failed :-(",
-    "status": "helaas onsuccesvol",
+    "status": "wrong answer",
     "messages": [{
         "format": "code",
         "description": "$input"
