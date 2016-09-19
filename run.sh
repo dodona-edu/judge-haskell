@@ -1,46 +1,23 @@
 #!/bin/bash
+VALUE=$(cat)
+SOURCE=$(jsawk  'return this.source' <<< "$VALUE")
+RESOURCES=$(jsawk  'return this.resources' <<< "$VALUE")
 
-input="$(cat | base64 | tr -d "\n")"
-env="$(ls | base64 | tr -d "\n")"
+touch "Input.hs"
+echo "module Input where" >  "Input.hs"
+cat "$SOURCE" >>  "Input.hs" 
+cp  $(echo "$RESOURCES"/*_test.hs)  . 
+OUTPUT="$(runghc *_test.hs 2> /dev/null)"
 
 cat <<HERE
 {
     "accepted": false,
     "description": "failed :-(",
-    "status": "wrong answer",
-    "messages": [{
-        "format": "code",
-        "description": "$input"
-    },{
-        "format": "code",
-        "description": "$env"
-    }],
+    "status": "helaas onsuccesvol",
     "groups": [{
         "accepted": false,
         "description": "tab title",
-        "groups": [{
-            "accepted": false,
-            "groups": [{
-                "accepted": false,
-                "description": "ggd 12 3",
-                "tests": [{
-                    "accepted": false,
-                    "generated": "4",
-                    "expected": "3"
-                }]
-            }]
-        },{
-            "accepted": true,
-            "groups": [{
-                "accepted": true,
-                "description": "ggd 12 4",
-                "tests": [{
-                    "accepted": true,
-                    "generated": "4"
-                }]
-            }]
-        }]
-    }]
+        "groups": $OUTPUT    
+     }]
 }
 HERE
-
