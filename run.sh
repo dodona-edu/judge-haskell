@@ -23,12 +23,17 @@ find "$RESOURCES" -name '*_test.hs' | while read testfile; do
     testname="${testfile%_test.hs}"
     tabtitle="${testname//_/ }"
     #output="$(runghc -i.:"$RESOURCES" "$testfile" 2> stderr.file)"
-    output="$(cabal exec runghc "$testfile" 2> /dev/null)"
+    output="$(cabal exec runghc "$testfile" 2> stderr.file)"
 
     cat <<HERE
     }, {
         "accepted": false,
         "description": "${tabtitle:-test}",
+        "messages": [{
+            "format": "code",
+            "permission": "staff",
+            "description": "$(base64 < stderr.file | tr -d '\n')"
+        }],
         "groups": ${output:-[]}
 HERE
 done | tail -n +2
