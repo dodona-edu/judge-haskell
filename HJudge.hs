@@ -31,11 +31,11 @@ myPutText = PutText reportMsg 0  :: PutText Int
 --
 -- Generate a json string of accepted or failed tests 
 --
-makeOutput descr test =
+makeOutput failed descr test =
  "{"++
- "        \"accepted\": false,"++
+ "        \"accepted\": "++ failed ++ ","++
  "        \"groups\": [{"++
- "            \"accepted\": false,"++
+ "            \"accepted\": "++ failed ++","++
  "            \"description\": \"" ++ descr ++ "\","++
  "            \"tests\": [ " ++ test ++ "]"++
  "        }]"++
@@ -47,11 +47,11 @@ makeOutput descr test =
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
 isEqual preface expected actual =
   if actual == expected then assertFailure msgOk else assertFailure msgFail
-  where	msgFail = makeOutput preface $
+  where	msgFail = makeOutput "false" preface $
   	        "{ \"accepted\": false,\n" ++ 
                    "\"expected\": \"" ++ show expected ++ 
                    "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
-        msgOk  = makeOutput preface $
+        msgOk  = makeOutput "true" preface $
   	          "{ \"accepted\": true,\n" ++ 
                      "\"expected\": \"" ++ show expected ++ 
                      "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
@@ -65,7 +65,7 @@ isLast state = (cases $ counts state) == (tried $ counts state)
 seperator ss = sep 
 	where sep = if isLast ss then "" else ","
 
-makeCrash msg = makeOutput "total fail" $ 
+makeCrash msg = makeOutput "false" "total fail" $ 
    "{ \"accepted\": false,\n" ++  
    "\"expected\": \"" ++ "complete crash" ++  
    "\",\n\"generated\": \"" ++  quoteNewline msg ++ "\"\n } \n"
