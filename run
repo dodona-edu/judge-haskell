@@ -1,47 +1,96 @@
 #!/bin/bash
 
-VALUE="$(cat)"
-SOURCE="$(jq -r '.source' <<< "$VALUE")"
-RESOURCES="$(jq -r '.resources' <<< "$VALUE")"
-JUDGE="$(jq -r '.judge' <<< "$VALUE")"
-WORKDIR="$(jq -r '.workdir' <<< "$VALUE")"
+# Temp files
+config="$(mktemp)"      # configuration
+result="$(mktemp)"      # result json
+compilation="$(mktemp)" # output of compilation
+execution="$(mktemp)"   # output of execution
 
-cd "$WORKDIR"
+trap "rm -f '$config' '$result' '$compilation' '$execution'" EXIT
 
-# Create the Input.hs module, containing the submitted code.
+# Cleaning up
+rm "$config" "$result" "$execution" "$compilation"
+# Saving the configuration from stdin
+cat > "$config"
+
+# Directories containing the test files and the judge repository
+resources="$(jshon -e 'resources' -u < "$config")"
+judge="$(jshon -e 'judge' -u < "$config")"
+
+# All our code should be executed in the workdir
+cd "$(jshon -e 'workdir' -u < "$config")"
+
+# Create the Input.hs module, containing the submitted code
 echo "module Input where" > "Input.hs"
-cat "$SOURCE" >> "Input.hs" 
+cat "$(jshon -e 'source' -u < "$config")" >> "Input.hs" 
+
+# Compiling and running each test file.
+while read testfile; do
+    testbase="$(basename "$testfile")"
+    testname="${testbase%_test.hs}"
+    tabtitle="${testname//_/ }"
+
+    # Compilation
+    cp "$judge/HJudge.hs" ..
+    cp "$testfile" ..
+
+    if ! cabal exec -- ghc -i. -i.. "../$testbase" -o runtest > "$compilation" 2>&1; then
+        # compilation failed
+        jshon -Q -n object                                    \
+            -n false -i 'accepted'                            \
+            -s 'Compilatie mislukt' -i 'description'          \
+            -s 'compilation error' -i 'status'                \
+            -n array -n object                                \
+                -s "Compilatie" -i 'description'              \
+                -n false -i 'accepted'                        \
+                -n array -n object                            \
+                    -s 'code' -i 'format'                     \
+                    -s "$(cat $compilation)" -i 'description' \
+                -i 0 -i 'messages'                            \
+            -i 0 -i 'groups'
+        exit 0
+    fi
+    rm -f "../${testname}_test.*"
+    rm -f "../HJudge.*"
+
+    # Running the test
+    ./runtest > "$execution" 2>&1
+
+    # Starting output, with separator
+    echo '}, {' >> "$result"
+
+    # whether this tab is accepted or not
+    if grep -q '"accepted": false' "$execution"; then
+        echo '"accepted": false,' >> "$result"
+    else
+        echo '"accepted": true,' >> "$result"
+    fi
+
+    # the title
+    echo '"description": "'"${tabtitle:-test}"'",' >> "$result"
+
+    # finally, the actual testcases
+    echo '"groups":' >> "$result"
+    cat "$execution" >> "$result"
+done < <(find "$resources" -name '*_test.hs')
+
+# accepted or not
+if grep -q '"accepted": false' "$result"; then
+    accepted="false"
+    description="Foute oplossing"
+    status="wrong"
+else
+    accepted="true"
+    description="Juiste oplossing"
+    status="correct"
+fi
 
 cat <<HERE
 {
-    "accepted": false,
-    "description": "failed :-(",
-    "status": "wrong",
-    "groups": [{
-HERE
-
-cp "$JUDGE/HJudge.hs" .
-find "$RESOURCES" -name '*_test.hs' | while read testfile; do
-    cp "$testfile" .
-    testfile="$(basename "$testfile")"
-    testname="${testfile%_test.hs}"
-    tabtitle="${testname//_/ }"
-    output="$(cabal exec runghc "$testfile" 2> stderr.file)"
-
-    cat <<HERE
-    }, {
-        "accepted": false,
-        "description": "${tabtitle:-test}",
-        "messages": [{
-            "format": "code",
-            "permission": "staff",
-            "description": "$(base64 < stderr.file | tr -d '\n')"
-        }],
-        "groups": ${output:-[]}
-HERE
-done | tail -n +2
-
-cat <<HERE
-    }]
+    "accepted": $accepted,
+    "description": "$description",
+    "status": "$status",
+    "groups": [{ $(tail -n +2 $result) }]
 }
 HERE
+
