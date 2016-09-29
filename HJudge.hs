@@ -65,9 +65,9 @@ isLast state = (cases $ counts state) == (tried $ counts state)
 seperator ss = sep 
 	where sep = if isLast ss then "" else ","
 
-makeCrash msg = makeOutput "false" "total fail" $ 
+makeCrash msg = makeOutput "false" "Kan oefening niet evalueren, waarschijnlijk zit er nog een fout in je code." $ 
    "{ \"accepted\": false,\n" ++  
-   "\"expected\": \"" ++ "complete crash" ++  
+   "\"expected\": \"" ++ " " ++  
    "\",\n\"generated\": \"" ++  quoteNewline msg ++ "\"\n } \n"
 
 makeTests list = TestList $ map (TestLabel "")   list
