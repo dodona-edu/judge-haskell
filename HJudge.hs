@@ -49,15 +49,15 @@ isEqual preface expected actual =
   if actual == expected then assertFailure msgOk else assertFailure msgFail
     where msgFail = makeOutput "false" preface $
                    "{ \"accepted\": false,\n" ++
-                   "\"expected\": \"" ++ show expected ++
-                   "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
+                   "\"expected\": \"" ++ quoteJSON (show expected) ++
+                   "\",\n\"generated\": \"" ++ quoteJSON (show actual) ++ "\"\n } \n"
           msgOk  = makeOutput "true" preface $
                    "{ \"accepted\": true,\n" ++
-                   "\"expected\": \"" ++ show expected ++
-                   "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
+                   "\"expected\": \"" ++ quoteJSON (show expected) ++
+                   "\",\n\"generated\": \"" ++ quoteJSON (show actual) ++ "\"\n } \n"
 
 -- Replace all newlines by quoted newlines
-quoteNewline = replace "\n" "\\n"
+quoteJSON = (replace "\"" "\\\"") . (replace "\n" "\\n")
 
 
 isLast state = (cases $ counts state) == (tried $ counts state)
@@ -68,7 +68,7 @@ seperator ss = sep
 makeCrash msg = makeOutput "false" "Kan oefening niet evalueren, waarschijnlijk zit er nog een fout in je code." $ 
    "{ \"accepted\": false,\n" ++  
    "\"expected\": \"" ++ " " ++  
-   "\",\n\"generated\": \"" ++  quoteNewline msg ++ "\"\n } \n"
+   "\",\n\"generated\": \"" ++  quoteJSON msg ++ "\"\n } \n"
 
 makeTests list = TestList $ map (TestLabel "")   list
 
