@@ -1,13 +1,13 @@
---   ___ ___      ____.         .___              
---  /   |   \    |    |__ __  __| _/ ____   ____  
--- /    ~    \   |    |  |  \/ __ | / ___\_/ __ \ 
--- \    Y    /\__|    |  |  / /_/ |/ /_/  >  ___/ 
+--   ___ ___      ____.         .___
+--  /   |   \    |    |__ __  __| _/ ____   ____
+-- /    ~    \   |    |  |  \/ __ | / ___\_/ __ \
+-- \    Y    /\__|    |  |  / /_/ |/ /_/  >  ___/
 --  \___|_  /\________|____/\____ |\___  / \___  >
---        \/                     \/_____/      \/ 
+--        \/                     \/_____/      \/
 
 --
--- This is a custom judge for the haskell platform 
--- Currently the judge is very minimal and only supports 
+-- This is a custom judge for the haskell platform
+-- Currently the judge is very minimal and only supports
 -- isEqual and complete failure
 --
 
@@ -17,10 +17,10 @@ import Test.HUnit
 import Control.Monad
 import Data.String.Utils
 
--- 
--- Helper function so that we can intercept 
+--
+-- Helper function so that we can intercept
 -- generation of messages by HUnit
--- 
+--
 reportMsg :: String -> Bool -> Int -> IO Int
 reportMsg message isProgress count = do
   putStrLn $ if isProgress then  message else ""
@@ -29,7 +29,7 @@ reportMsg message isProgress count = do
 myPutText = PutText reportMsg 0  :: PutText Int
 
 --
--- Generate a json string of accepted or failed tests 
+-- Generate a json string of accepted or failed tests
 --
 makeOutput failed descr test =
  "{"++
@@ -47,23 +47,23 @@ makeOutput failed descr test =
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
 isEqual preface expected actual =
   if actual == expected then assertFailure msgOk else assertFailure msgFail
-  where	msgFail = makeOutput "false" preface $
-  	        "{ \"accepted\": false,\n" ++ 
-                   "\"expected\": \"" ++ show expected ++ 
+    where msgFail = makeOutput "false" preface $
+                   "{ \"accepted\": false,\n" ++
+                   "\"expected\": \"" ++ show expected ++
                    "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
-        msgOk  = makeOutput "true" preface $
-  	          "{ \"accepted\": true,\n" ++ 
-                     "\"expected\": \"" ++ show expected ++ 
-                     "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
-       
--- Replace all newlines by quoted newlines 
-quoteNewline = replace "\n" "\\n" 
+          msgOk  = makeOutput "true" preface $
+                   "{ \"accepted\": true,\n" ++
+                   "\"expected\": \"" ++ show expected ++
+                   "\",\n\"generated\": \"" ++ show actual ++ "\"\n } \n"
+
+-- Replace all newlines by quoted newlines
+quoteNewline = replace "\n" "\\n"
 
 
 isLast state = (cases $ counts state) == (tried $ counts state)
 
-seperator ss = sep 
-	where sep = if isLast ss then "" else ","
+seperator ss = sep
+    where sep = if isLast ss then "" else ","
 
 makeCrash msg = makeOutput "false" "Kan oefening niet evalueren, waarschijnlijk zit er nog een fout in je code." $ 
    "{ \"accepted\": false,\n" ++  
@@ -81,7 +81,7 @@ runTestJSON (PutText put us0) t = do
   putStrLn "]"
   return ()
  where
-  reportStart ss = put "" False 
-  reportFail  loc msg ss = put (msg ++ (seperator ss)) True 
-  reportError loc msg ss = put (makeCrash  msg ++ (seperator ss)) True 
+  reportStart ss = put "" False
+  reportFail  loc msg ss = put (msg ++ (seperator ss)) True
+  reportError loc msg ss = put (makeCrash  msg ++ (seperator ss)) True
 
