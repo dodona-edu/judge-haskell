@@ -14,8 +14,11 @@ rm "$config" "$result" "$execution" "$compilation"
 cat > "$config"
 
 # Directories containing the test files and the judge repository
-evaluation="$(jshon -e 'evaluation' -u < "$config")"
+resources="$(jshon -e 'resources' -u < "$config")"
 judge="$(jshon -e 'judge' -u < "$config")"
+
+# All our code should be executed in the workdir
+cd "$(jshon -e 'workdir' -u < "$config")"
 
 # Create the Input.hs module, containing the submitted code
 echo "module Input where" > "Input.hs"
@@ -69,7 +72,7 @@ while read testfile; do
     # finally, the actual testcases
     echo '"groups":' >> "$result"
     cat "$execution" >> "$result"
-done < <(find "$evaluation" -name '*_test.hs')
+done < <(find "$resources" -name '*_test.hs')
 
 # accepted or not
 if grep -q '"accepted": false' "$result"; then
