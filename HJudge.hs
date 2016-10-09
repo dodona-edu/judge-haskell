@@ -36,7 +36,10 @@ makeOutput failed descr test =
  "        \"accepted\": "++ failed ++ ","++
  "        \"groups\": [{"++
  "            \"accepted\": "++ failed ++","++
- "            \"description\": \"" ++ quoteJSON descr ++ "\","++
+ "            \"description\": {"++
+ "                 \"format\": \"code\","++
+ "                 \"description\": \"" ++ quoteJSON descr ++ "\""++
+ "            },"++
  "            \"tests\": [ " ++ test ++ "]"++
  "        }]"++
  "}"
