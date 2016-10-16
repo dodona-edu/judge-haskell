@@ -31,10 +31,7 @@ while read testfile; do
     tabtitle="${testname//_/ }"
 
     # Compilation
-    cp "$judge/HJudge.hs" ..
-    cp "$testfile" ..
-
-    if ! cabal exec -- ghc -i. -i.. "../$testbase" -o runtest > "$compilation" 2>&1; then
+    if ! cabal exec -- ghc -outputdir "/tmp" -i"$judge" -i"$resources" "$testfile" -o runtest > "$compilation" 2>&1; then
         # compilation failed
         jshon -Q -n object                                    \
             -n false -i 'accepted'                            \
