@@ -16,6 +16,10 @@ cat > "$config"
 resources="$(jshon -e 'resources' -u < "$config")"
 judge="$(jshon -e 'judge' -u < "$config")"
 
+# The length of the timeout
+time_limit="$(jshon -e 'time_limit' -u < "$config")"
+time_limit="$(( time_limit - 10 ))"
+
 # All our code should be executed in the workdir
 cd "$(jshon -e 'workdir' -u < "$config")"
 
@@ -51,7 +55,16 @@ while read testfile; do
     rm -f "../HJudge.*"
 
     # Running the test
-    ./runtest > "$execution" 2>&1
+    timeout "$time_limit" ./runtest > "$execution" 2>&1
+    if [ "$?" = 124 ]; then
+        # timeout
+        jshon -Q -n object                                 \
+            -n false -i 'accepted'                         \
+            -s 'Tijdslimiet overschreden' -i 'description' \
+            -s 'time limit exceeded' -i 'status'
+        exit 0
+    fi
+
     rm runtest /tmp/outputdir/*
 
     # Starting output, with separator
