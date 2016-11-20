@@ -17,6 +17,7 @@ import Test.HUnit
 import Control.Monad
 import Data.String.Utils
 
+
 --
 -- Helper function so that we can intercept
 -- generation of messages by HUnit
@@ -59,18 +60,39 @@ isEqual preface expected actual =
                    "\"expected\": \"" ++ quoteJSON (show expected) ++
                    "\",\n\"generated\": \"" ++ quoteJSON (show actual) ++ "\"\n } \n"
 
--- Replace all newlines by quoted newlines
-quoteJSON = (replace "\"" "\\\"") . (replace "\n" "\\n")
 
+
+---
+--- Helper function to join strings with a space
+---
+s_concat :: [String] -> String
+s_concat =  Data.String.Utils.join " "
+
+---
+--- Generation of testcases
+---
+judge1 :: (Show t, Show a, Eq a) => [Char] -> (t -> a) -> (t -> a) -> [t] -> [Test]
+judge2 :: (Show t1, Show t, Show a, Eq a) => [Char] -> (t -> t1 -> a) -> (t -> t1 -> a) -> [(t, t1)] -> [Test]
+judge3 :: (Show t2, Show t1, Show t, Show a, Eq a) => [Char] -> (t -> t1 -> t2 -> a) -> (t -> t1 -> t2 -> a) -> [(t, t1, t2)] -> [Test]
+judge4 :: (Show t3, Show t2, Show t1, Show t, Show a, Eq a) => [Char] -> (t -> t1 -> t2 -> t3 -> a) -> (t -> t1 -> t2 -> t3 -> a) -> [(t, t1, t2, t3)] -> [Test]
+judge1 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x])                      (fs x)       (fi x))       | x         <- input ]
+judge2 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y])               (fs x y)     (fi x y))     | (x,y)     <- input ]
+judge3 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y,show z])        (fs x y z)   (fi x y z))   | (x,y,z)   <- input ]
+judge4 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y,show z,show q]) (fs x y z q) (fi x y z q)) | (x,y,z,q) <- input ]
+
+
+-- Replace all newlines by quoted newlines
+-- Temporal hack to get rid of quoted string errors
+quoteJSON = (replace "\"" "\\\"") . (replace "\n" "\\n") . filter (\x -> x /=  '\\' )
 
 isLast state = (cases $ counts state) == (tried $ counts state)
 
 seperator ss = sep
     where sep = if isLast ss then "" else ","
 
-makeCrash msg = makeOutput "false" "Kan oefening niet evalueren, waarschijnlijk zit er nog een fout in je code." $ 
-   "{ \"accepted\": false,\n" ++  
-   "\"expected\": \"" ++ " " ++  
+makeCrash msg = makeOutput "false" "Kan oefening niet evalueren, waarschijnlijk zit er nog een fout in je code." $
+   "{ \"accepted\": false,\n" ++
+   "\"expected\": \"" ++ " " ++
    "\",\n\"generated\": \"" ++  quoteJSON msg ++ "\"\n } \n"
 
 makeTests list = TestList $ map (TestLabel "")   list
@@ -87,4 +109,3 @@ runTestJSON (PutText put us0) t = do
   reportStart ss = put "" False
   reportFail  loc msg ss = put (msg ++ (seperator ss)) True
   reportError loc msg ss = put (makeCrash  msg ++ (seperator ss)) True
-
