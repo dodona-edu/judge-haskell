@@ -1,13 +1,12 @@
 #!/bin/bash
 
+# ==============================================================================
+# Setup of environment
+
 # Temp files
 config="$(mktemp)"      # configuration
 result="$(mktemp)"      # result json
 compilation="$(mktemp)" # output of compilation
-execution="$(mktemp)"   # output of execution
-mkdir "/tmp/outputdir"  # compilation directory
-
-trap "rm -rf '$config' '$result' '$compilation' '$execution' '/tmp/outputdir'" EXIT
 
 # Saving the configuration from stdin
 cat > "$config"
@@ -15,95 +14,112 @@ cat > "$config"
 # Directories containing the test files and the judge repository
 resources="$(jshon -e 'resources' -u < "$config")"
 judge="$(jshon -e 'judge' -u < "$config")"
+workdir="$(jshon -e 'workdir' -u < "$config")"
+builddir="$(jshon -e 'builddir' -u < "$config")"
+builddir="${builddir:-/tmp/outputdir}"
 
-# The length of the timeout
-time_limit="$(jshon -e 'time_limit' -u < "$config")"
-time_limit="$(( time_limit - 10 ))"
+# Compilation directory
+mkdir -p "$builddir"
+
+trap "rm -rf '$config' '$result' '$compilation' '$execution' '$builddir'" EXIT
 
 # All our code should be executed in the workdir
-cd "$(jshon -e 'workdir' -u < "$config")"
+cd "$workdir"
 
 # Create the Input.hs module, containing the submitted code
 echo "module Input where" > "Input.hs"
 cat "$(jshon -e 'source' -u < "$config")" >> "Input.hs" 
 
+# ==============================================================================
+# Helper functions for JSON generation
+
+compilation_error() {
+    jshon -Q -n object -s 'focus-relative' -i 'command' \
+                       -s 'root' -i 'level'
+    jshon -Q -n object -s 'set-properties' -i 'command'   \
+                       -s 'compilation error' -i 'status' \
+                       -s "$1" -i 'description'           \
+                       -n false -i 'accepted'
+}
+
+append_message() {
+    jshon -Q -n object -s 'append-message' -i 'command'   \
+                       -n object -s "$1" -i 'format'      \
+                                 -s "$2" -i 'permission'  \
+                                 -s "$3" -i 'description' \
+                                 -i 'message'
+}
+
+# ==============================================================================
+# Compiling and running tests.
+
+# Compiling the judge code
+if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HJudge.hs" > "$compilation" 2>&1; then
+    jshon -Q -n object -s 'set-properties' -i 'command'               \
+                       -s 'internal error' -i 'status'                \
+                       -s 'Compilatie judge mislukt' -i 'description' \
+                       -n false -i 'accepted'
+    append_message 'code' 'staff' "$(cat "$compilation")"
+    exit 0
+fi
+
+# In the beginning, we assume the code will time out.
+jshon -Q -n object -s 'set-properties' -i 'command'               \
+                   -s 'time limit exceeded' -i 'status'           \
+                   -s 'Tijdslimiet overschreden' -i 'description' \
+                   -n false -i 'accepted'
+
+# Compiling the user code.
+if ! cabal exec -- ghc -outputdir "$builddir" "Input.hs" > "$compilation" 2>&1; then
+    compilation_error "Compilatie mislukt"
+    jshon -Q -n object -s 'new-tab' -i 'command'
+    jshon -Q -n object -s 'set-properties' -i 'command' \
+                       -s 'Compilatie' -i 'description' \
+                       -n false -i 'accepted'
+    append_message 'code' 'student' "$(cat "$compilation")"
+    exit 0
+fi
+
 # Compiling and running each test file.
+failed_tabs="0"
 while read testfile; do
     testbase="$(basename "$testfile")"
     testname="${testbase%_test.hs}"
     tabtitle="${testname//_/ }"
 
+    jshon -Q -n object -s 'new-tab' -i 'command'
+    jshon -Q -n object -s 'set-properties' -i 'command' \
+                       -s "$tabtitle" -i 'description'
+
     # Compilation
-    if ! cabal exec -- ghc -outputdir "/tmp/outputdir" -i"$judge" -i"$resources" "$testfile" -o runtest > "$compilation" 2>&1; then
-        # compilation failed
-        jshon -Q -n object                                    \
-            -n false -i 'accepted'                            \
-            -s 'Compilatie mislukt' -i 'description'          \
-            -s 'compilation error' -i 'status'                \
-            -n array -n object                                \
-                -s "Compilatie" -i 'description'              \
-                -n false -i 'accepted'                        \
-                -n array -n object                            \
-                    -s 'code' -i 'format'                     \
-                    -s "$(cat $compilation)" -i 'description' \
-                -i 0 -i 'messages'                            \
-            -i 0 -i 'groups'
+    cp "$testfile" "$testbase"
+    if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$testbase" -o runtest > "$compilation" 2>&1; then
+        append_message 'code' 'student' "$(cat "$compilation")"
+        compilation_error "Interface onvoldaan"
         exit 0
     fi
-
-    rm -f "../${testname}_test.*"
-    rm -f "../HJudge.*"
+    rm "$testbase"
 
     # Running the test
-    timeout "$time_limit" ./runtest > "$execution" 2>&1
-    if [ "$?" = 124 ]; then
-        # timeout
-        jshon -Q -n object                                 \
-            -n false -i 'accepted'                         \
-            -s 'Tijdslimiet overschreden' -i 'description' \
-            -s 'time limit exceeded' -i 'status'
-        exit 0
-    fi
+    ./runtest || failed_tabs="$((failed_tabs + 1))"
 
-    rm runtest /tmp/outputdir/*
-
-    # Starting output, with separator
-    echo '}, {' >> "$result"
-
-    # whether this tab is accepted or not
-    if grep -q '"accepted": false' "$execution"; then
-        echo '"accepted": false,' >> "$result"
-    else
-        echo '"accepted": true,' >> "$result"
-    fi
-
-    # the title
-    echo '"description": "'"${tabtitle:-test}"'",' >> "$result"
-
-    # finally, the actual testcases
-    echo '"groups":' >> "$result"
-    cat "$execution" >> "$result"
-
-    > "$execution"
+    # Cleanup
+    rm runtest
 done < <(find "$resources" -name '*_test.hs')
 
-# accepted or not
-if grep -q '"accepted": false' "$result"; then
-    accepted="false"
-    description="Foute oplossing"
-    status="wrong"
+if (( failed_tabs == 0 )); then
+    jshon -Q -n object -s 'focus-relative' -i 'command' \
+                       -s 'root' -i 'level'
+    jshon -Q -n object -s 'set-properties' -i 'command' \
+                       -s 'correct' -i 'status'         \
+                       -s "Correct" -i 'description'    \
+                       -n true -i 'accepted'
 else
-    accepted="true"
-    description="Juiste oplossing"
-    status="correct"
+    jshon -Q -n object -s 'focus-relative' -i 'command' \
+                       -s 'root' -i 'level'
+    jshon -Q -n object -s 'set-properties' -i 'command' \
+                       -s 'wrong' -i 'status'         \
+                       -s "Fout" -i 'description'    \
+                       -n false -i 'accepted'
 fi
-
-cat <<HERE
-{
-    "accepted": $accepted,
-    "description": "$description",
-    "status": "$status",
-    "groups": [{ $(tail -n +2 $result) }]
-}
-HERE
 

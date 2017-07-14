@@ -14,8 +14,12 @@
 module HJudge where
 
 import Test.HUnit
-import Control.Monad
 import Data.String.Utils
+import qualified Data.Json.Builder as JSON
+import qualified Data.ByteString as BL
+import Data.Monoid ((<>))
+import qualified System.IO as IO
+import System.Exit (exitFailure, exitSuccess)
 
 
 --
@@ -23,44 +27,38 @@ import Data.String.Utils
 -- generation of messages by HUnit
 --
 reportMsg :: String -> Bool -> Int -> IO Int
-reportMsg message isProgress count = do
-  putStrLn $ if isProgress then  message else ""
-  return (count+1)
+reportMsg message isProgress count = return count
 
-myPutText = PutText reportMsg 0  :: PutText Int
-
---
--- Generate a json string of accepted or failed tests
---
-makeOutput failed descr test =
- "{"++
- "        \"accepted\": "++ failed ++ ","++
- "        \"groups\": [{"++
- "            \"accepted\": "++ failed ++","++
- "            \"description\": {"++
- "                 \"format\": \"code\","++
- "                 \"description\": \"" ++ quoteJSON descr ++ "\""++
- "            },"++
- "            \"tests\": [ " ++ test ++ "]"++
- "        }]"++
- "}"
+myPutText :: PutText Int
+myPutText = PutText reportMsg 0
 
 --
 -- Used by HUnit to generate output for an equality test
 --
+writeJSON :: JSON.Value a => a -> IO ()
+writeJSON = BL.putStr . JSON.toJsonBS
+
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
-isEqual preface expected actual =
-  if actual == expected then assertFailure msgOk else assertFailure msgFail
-    where msgFail = makeOutput "false" preface $
-                   "{ \"accepted\": false,\n" ++
-                   "\"expected\": \"" ++ quoteJSON (show expected) ++
-                   "\",\n\"generated\": \"" ++ quoteJSON (show actual) ++ "\"\n } \n"
-          msgOk  = makeOutput "true" preface $
-                   "{ \"accepted\": true,\n" ++
-                   "\"expected\": \"" ++ quoteJSON (show expected) ++
-                   "\",\n\"generated\": \"" ++ quoteJSON (show actual) ++ "\"\n } \n"
-
-
+isEqual preface should actual = if actual == should
+                                   then testcase True actual actual
+                                   else testcase False should actual
+    where
+        testcase accepted expected generated = do
+            writeJSON $ JSON.row "command" "new-context"
+            writeJSON $ JSON.row "command" "set-properties"
+                     <> JSON.row "accepted" accepted
+            writeJSON $ JSON.row "command" "new-testcase"
+            writeJSON $ JSON.row "command" "set-properties"
+                     <> JSON.row "description" (JSON.row "format" "haskell"
+                                             <> JSON.row "description" preface
+                                               )
+                     <> JSON.row "accepted" accepted
+            writeJSON $ JSON.row "command" "new-test"
+            writeJSON $ JSON.row "command" "set-properties"
+                     <> JSON.row "accepted" accepted
+                     <> JSON.row "expected" (show expected)
+                     <> JSON.row "generated" (show generated)
+            assertBool "" accepted
 
 ---
 --- Helper function to join strings with a space
@@ -80,32 +78,49 @@ judge2 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y])     
 judge3 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y,show z])        (fs x y z)   (fi x y z))   | (x,y,z)   <- input ]
 judge4 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y,show z,show q]) (fs x y z q) (fi x y z q)) | (x,y,z,q) <- input ]
 
-
--- Replace all newlines by quoted newlines
--- Temporal hack to get rid of quoted string errors
-quoteJSON = (replace "\"" "\\\"") . (replace "\n" "\\n") . filter (\x -> x /=  '\\' )
-
-isLast state = (cases $ counts state) == (tried $ counts state)
-
-seperator ss = sep
-    where sep = if isLast ss then "" else ","
-
-makeCrash msg = makeOutput "false" "Kan oefening niet evalueren, waarschijnlijk zit er nog een fout in je code." $
-   "{ \"accepted\": false,\n" ++
-   "\"expected\": \"" ++ " " ++
-   "\",\n\"generated\": \"" ++  quoteJSON msg ++ "\"\n } \n"
-
+makeTests :: [Test] -> Test
 makeTests list = TestList $ map (TestLabel "")   list
 
-runJSON list = runTestJSON myPutText (makeTests list)
+runJSON :: [Test] -> IO ()
+runJSON list = do
+    -- TODO: improve focus so I can set the tab status in here,
+    -- something like {"command": "focus", "level": "tab"}
+    e <- runTestJSON myPutText (makeTests list)
+    if e then exitSuccess else exitFailure
 
-runTestJSON :: PutText st -> Test -> IO ()
+runTestJSON :: PutText Int -> Test -> IO Bool
 runTestJSON (PutText put us0) t = do
-  putStrLn "["
+  IO.hSetBuffering IO.stdout IO.LineBuffering
   (counts', us1) <- performTest reportStart reportError reportFail us0 t
-  putStrLn "]"
-  return ()
+  return $ failures counts' + errors counts' == 0
  where
-  reportStart ss = put "" False
-  reportFail  loc msg ss = put (msg ++ (seperator ss)) True
-  reportError loc msg ss = put (makeCrash  msg ++ (seperator ss)) True
+  reportStart ss count = do
+      -- TODO: open testcase with the top Label in `path ss`. This
+      -- requires rewriting all tests with labels or somehow replacing
+      -- isEqual with an Assertion I can get the preface from.
+      -- The opened testcase should be successfull, with everything for
+      -- a succeeding test filled in (but we can't get the actual?).
+      -- putStrLn $ show $ path ss
+      return count
+  reportFail loc msg ss count = do
+      -- replace this with modifying above this to a failure
+      return $ count + 1
+  reportError loc msg ss count = do
+      -- TODO: set status to runtime error? perhaps in stead of count?
+      writeJSON $ JSON.row "command" "push-focus"
+      writeJSON $ JSON.row "command" "focus-relative"
+               <> JSON.row "level" "root"
+      writeJSON $ JSON.row "command" "set-properties"
+               <> JSON.row "accepted" False
+               <> JSON.row "status" "runtime error"
+               <> JSON.row "description" "Fout tijdens uitvoering"
+      writeJSON $ JSON.row "command" "pop-focus"
+
+      writeJSON $ JSON.row "command" "new-context"
+      writeJSON $ JSON.row "command" "set-properties"
+               <> JSON.row "accepted" False
+      writeJSON $ JSON.row "command" "new-testcase"
+      writeJSON $ JSON.row "command" "set-properties"
+               <> JSON.row "description" msg
+               <> JSON.row "accepted" False
+      return $ count + 1
