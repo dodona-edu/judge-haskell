@@ -19,18 +19,17 @@ import qualified Data.Json.Builder as JSON
 import qualified Data.ByteString as BL
 import Data.Monoid ((<>))
 import qualified System.IO as IO
-import System.Exit (exitFailure, exitSuccess)
 
 
 --
 -- Helper function so that we can intercept
 -- generation of messages by HUnit
 --
-reportMsg :: String -> Bool -> Int -> IO Int
+reportMsg :: String -> Bool -> () -> IO ()
 reportMsg message isProgress count = return count
 
-myPutText :: PutText Int
-myPutText = PutText reportMsg 0
+myPutText :: PutText ()
+myPutText = PutText reportMsg ()
 
 --
 -- Used by HUnit to generate output for an equality test
@@ -39,26 +38,24 @@ writeJSON :: JSON.Value a => a -> IO ()
 writeJSON = BL.putStr . JSON.toJsonBS
 
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
-isEqual preface should actual = if actual == should
-                                   then testcase True actual actual
-                                   else testcase False should actual
-    where
-        testcase accepted expected generated = do
-            writeJSON $ JSON.row "command" "new-context"
-            writeJSON $ JSON.row "command" "set-properties"
-                     <> JSON.row "accepted" accepted
-            writeJSON $ JSON.row "command" "new-testcase"
-            writeJSON $ JSON.row "command" "set-properties"
-                     <> JSON.row "description" (JSON.row "format" "haskell"
-                                             <> JSON.row "description" preface
-                                               )
-                     <> JSON.row "accepted" accepted
-            writeJSON $ JSON.row "command" "new-test"
-            writeJSON $ JSON.row "command" "set-properties"
-                     <> JSON.row "accepted" accepted
-                     <> JSON.row "expected" (show expected)
-                     <> JSON.row "generated" (show generated)
-            assertBool "" accepted
+isEqual preface should actual = do
+    writeJSON $ JSON.row "command" "start-context"
+    writeJSON $ JSON.row "command" "start-testcase"
+             <> JSON.row "description" (JSON.row "format" "haskell" <> JSON.row "description" preface)
+    writeJSON $ JSON.row "command" "start-test"
+             <> JSON.row "expected" (show should)
+    let accepted = should == actual
+    if accepted then writeJSON $ JSON.row "command" "close-test"
+                              <> JSON.row "generated" (show actual)
+                              <> JSON.row "accepted" True
+                              <> JSON.row "status" (JSON.row "enum" "correct" <> JSON.row "human" "Juist antwoord")
+                else writeJSON $ JSON.row "command" "close-test"
+                              <> JSON.row "generated" (show actual)
+                              <> JSON.row "accepted" False
+                              <> JSON.row "status" (JSON.row "enum" "wrong" <> JSON.row "human" "Fout antwoord")
+    writeJSON $ JSON.row "command" "close-testcase"
+    writeJSON $ JSON.row "command" "close-context"
+    assertBool "" accepted
 
 ---
 --- Helper function to join strings with a space
@@ -85,42 +82,26 @@ runJSON :: [Test] -> IO ()
 runJSON list = do
     -- TODO: improve focus so I can set the tab status in here,
     -- something like {"command": "focus", "level": "tab"}
-    e <- runTestJSON myPutText (makeTests list)
-    if e then exitSuccess else exitFailure
+    runTestJSON myPutText (makeTests list)
 
-runTestJSON :: PutText Int -> Test -> IO Bool
+runTestJSON :: PutText () -> Test -> IO ()
 runTestJSON (PutText put us0) t = do
   IO.hSetBuffering IO.stdout IO.LineBuffering
-  (counts', us1) <- performTest reportStart reportError reportFail us0 t
-  return $ failures counts' + errors counts' == 0
+  _ <- performTest reportStart reportError reportFail us0 t
+  return ()
  where
-  reportStart ss count = do
+  reportStart ss count = return ()
       -- TODO: open testcase with the top Label in `path ss`. This
       -- requires rewriting all tests with labels or somehow replacing
       -- isEqual with an Assertion I can get the preface from.
       -- The opened testcase should be successfull, with everything for
       -- a succeeding test filled in (but we can't get the actual?).
       -- putStrLn $ show $ path ss
-      return count
-  reportFail loc msg ss count = do
-      -- replace this with modifying above this to a failure
-      return $ count + 1
+  reportFail loc msg ss count = return ()
   reportError loc msg ss count = do
-      -- TODO: set status to runtime error? perhaps in stead of count?
-      writeJSON $ JSON.row "command" "push-focus"
-      writeJSON $ JSON.row "command" "focus-relative"
-               <> JSON.row "level" "root"
-      writeJSON $ JSON.row "command" "set-properties"
+      writeJSON $ JSON.row "command" "close-test"
                <> JSON.row "accepted" False
-               <> JSON.row "status" "runtime error"
-               <> JSON.row "description" "Fout tijdens uitvoering"
-      writeJSON $ JSON.row "command" "pop-focus"
-
-      writeJSON $ JSON.row "command" "new-context"
-      writeJSON $ JSON.row "command" "set-properties"
-               <> JSON.row "accepted" False
-      writeJSON $ JSON.row "command" "new-testcase"
-      writeJSON $ JSON.row "command" "set-properties"
-               <> JSON.row "description" msg
-               <> JSON.row "accepted" False
-      return $ count + 1
+               <> JSON.row "status" (JSON.row "enum" "runtime error" <> JSON.row "human" "Fout tijdens uitvoering")
+               <> JSON.row "generated" ""
+      writeJSON $ JSON.row "command" "close-testcase"
+      writeJSON $ JSON.row "command" "close-context"

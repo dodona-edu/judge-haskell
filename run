@@ -53,73 +53,82 @@ append_message() {
 # ==============================================================================
 # Compiling and running tests.
 
+# Let's get started
+jshon -Q -n object -s 'start-judgement' -i 'command'
+
 # Compiling the judge code
 if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HJudge.hs" > "$compilation" 2>&1; then
-    jshon -Q -n object -s 'set-properties' -i 'command'               \
-                       -s 'internal error' -i 'status'                \
-                       -s 'Compilatie judge mislukt' -i 'description' \
-                       -n false -i 'accepted'
     append_message 'code' 'staff' "$(cat "$compilation")"
+    jshon -Q -n object -s 'close-judgement' -i 'command' \
+                       -n object -s 'internal error' -i 'enum' \
+                                 -s 'Compilatie judge mislukt' -i 'human' \
+                                 -i 'status' \
+                       -n false -i 'accepted'
     exit 0
 fi
-
-# In the beginning, we assume the code will time out.
-jshon -Q -n object -s 'set-properties' -i 'command'               \
-                   -s 'time limit exceeded' -i 'status'           \
-                   -s 'Tijdslimiet overschreden' -i 'description' \
-                   -n false -i 'accepted'
 
 # Compiling the user code.
+jshon -Q -n object -s 'start-tab' -i 'command' \
+                   -s 'compilatie' -i 'title' \
+                   -n true -i 'hidden'
+
+jshon -Q -n object -s 'start-context' -i 'command' \
+                   -n object -s "code" -i 'format' \
+                             -s "ghc Input.hs" -i 'description' \
+                             -i 'description'
+
 if ! cabal exec -- ghc -outputdir "$builddir" "Input.hs" > "$compilation" 2>&1; then
-    compilation_error "Compilatie mislukt"
-    jshon -Q -n object -s 'new-tab' -i 'command'
-    jshon -Q -n object -s 'set-properties' -i 'command' \
-                       -s 'Compilatie' -i 'description' \
-                       -n false -i 'accepted'
     append_message 'code' 'student' "$(cat "$compilation")"
+    jshon -Q -n object -s 'close-context' -i 'command' \
+                       -n false -i 'accepted'
+    jshon -Q -n object -s 'close-tab' -i 'command'
+    jshon -Q -n object -s 'close-judgement' -i 'command' \
+                       -n object -s 'compilation error' -i 'enum' \
+                                 -s 'Compilatie mislukt' -i 'human' \
+                                 -i 'status' \
+                       -n false -i 'accepted'
     exit 0
 fi
 
+jshon -Q -n object -s 'close-context' -i 'command'
+jshon -Q -n object -s 'close-tab' -i 'command'
+
+
 # Compiling and running each test file.
-failed_tabs="0"
 while read testfile; do
     testbase="$(basename "$testfile")"
     testname="${testbase%_test.hs}"
     tabtitle="${testname//_/ }"
 
-    jshon -Q -n object -s 'new-tab' -i 'command'
-    jshon -Q -n object -s 'set-properties' -i 'command' \
-                       -s "$tabtitle" -i 'description'
+    jshon -Q -n object -s 'start-tab' -i 'command' \
+                       -s "$tabtitle" -i 'title'
 
     # Compilation
     cp "$testfile" "$testbase"
     if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$testbase" -o runtest > "$compilation" 2>&1; then
+        jshon -Q -n object -s 'start-context' -i 'command' \
+                           -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
-        compilation_error "Interface onvoldaan"
+        jshon -Q -n object -s 'close-context' -i 'command' \
+                           -n false -i 'accepted'
+        jshon -Q -n object -s 'close-tab' -i 'command'
+        jshon -Q -n object -s 'close-judgement' -i 'command' \
+                           -n object -s 'compilation error' -i 'enum' \
+                                     -s 'Interface niet voldaan' -i 'human' \
+                                     -i 'status' \
+                           -n false -i 'accepted'
         exit 0
     fi
     rm "$testbase"
 
     # Running the test
-    ./runtest || failed_tabs="$((failed_tabs + 1))"
+    ./runtest
 
     # Cleanup
     rm runtest
+
+    jshon -Q -n object -s 'close-tab' -i 'command'
 done < <(find "$resources" -name '*_test.hs')
 
-if (( failed_tabs == 0 )); then
-    jshon -Q -n object -s 'focus-relative' -i 'command' \
-                       -s 'root' -i 'level'
-    jshon -Q -n object -s 'set-properties' -i 'command' \
-                       -s 'correct' -i 'status'         \
-                       -s "Correct" -i 'description'    \
-                       -n true -i 'accepted'
-else
-    jshon -Q -n object -s 'focus-relative' -i 'command' \
-                       -s 'root' -i 'level'
-    jshon -Q -n object -s 'set-properties' -i 'command' \
-                       -s 'wrong' -i 'status'         \
-                       -s "Fout" -i 'description'    \
-                       -n false -i 'accepted'
-fi
+jshon -Q -n object -s 'close-judgement' -i 'command'
 
