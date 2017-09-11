@@ -122,7 +122,9 @@ while read testfile; do
     rm "$testbase"
 
     # Running the test
+    set -e
     ./runtest
+    set +e
 
     # Cleanup
     rm runtest
