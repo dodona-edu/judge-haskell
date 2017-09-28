@@ -77,6 +77,18 @@ if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/QuickCheckJudge
     exit 0
 fi
 
+if ! cabal exec -- ghc -outputdir "$builddir" -o "$builddir/JSONLinter" -i"$judge" "$judge/JSONLinter.hs" > "$compilation" 2>&1; then
+    append_message 'code' 'staff' "$(cat "$compilation")"
+    jshon -Q -n object -s 'close-judgement' -i 'command' \
+                       -n object -s 'internal error' -i 'enum' \
+                                 -s 'Compilatie judge mislukt' -i 'human' \
+                                 -i 'status' \
+                       -n false -i 'accepted'
+    exit 0
+fi
+
+"$builddir/JSONLinter" "Input.hs"
+
 # Compiling the user code.
 jshon -Q -n object -s 'start-tab' -i 'command' \
                    -s 'compilatie' -i 'title' \
