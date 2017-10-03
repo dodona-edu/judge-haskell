@@ -57,7 +57,17 @@ append_message() {
 jshon -Q -n object -s 'start-judgement' -i 'command'
 
 # Compiling the judge code
-if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HJudge.hs" > "$compilation" 2>&1; then
+if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HUnitJudge.hs" > "$compilation" 2>&1; then
+    append_message 'code' 'staff' "$(cat "$compilation")"
+    jshon -Q -n object -s 'close-judgement' -i 'command' \
+                       -n object -s 'internal error' -i 'enum' \
+                                 -s 'Compilatie judge mislukt' -i 'human' \
+                                 -i 'status' \
+                       -n false -i 'accepted'
+    exit 0
+fi
+
+if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/QuickCheckJudge.hs" > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
