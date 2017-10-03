@@ -11,7 +11,7 @@
 -- isEqual and complete failure
 --
 
-module HJudge where
+module HUnitJudge where
 
 import Test.HUnit
 import Data.String.Utils
