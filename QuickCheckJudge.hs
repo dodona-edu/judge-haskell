@@ -30,6 +30,7 @@ judgeArgs = Args
   , maxDiscardRatio = 10
   , maxSize         = 100
   , chatty          = False
+  , maxShrinks      = 100
   }
 
 writeJSON :: JSON.Value a => a -> IO ()
