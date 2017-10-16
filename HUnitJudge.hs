@@ -14,7 +14,7 @@
 module HUnitJudge where
 
 import Test.HUnit
-import Data.String.Utils
+import Data.List (intercalate)
 import qualified Data.Json.Builder as JSON
 import qualified Data.ByteString as BL
 import Data.Monoid ((<>))
@@ -61,7 +61,7 @@ isEqual preface should actual = do
 --- Helper function to join strings with a space
 ---
 s_concat :: [String] -> String
-s_concat =  Data.String.Utils.join " "
+s_concat =  intercalate " "
 
 ---
 --- Generation of testcases
@@ -102,6 +102,6 @@ runTestJSON (PutText put us0) t = do
       writeJSON $ JSON.row "command" "close-test"
                <> JSON.row "accepted" False
                <> JSON.row "status" (JSON.row "enum" "runtime error" <> JSON.row "human" "Fout tijdens uitvoering")
-               <> JSON.row "generated" ""
+               <> JSON.row "generated" (show msg)
       writeJSON $ JSON.row "command" "close-testcase"
       writeJSON $ JSON.row "command" "close-context"
