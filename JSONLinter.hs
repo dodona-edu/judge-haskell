@@ -13,13 +13,13 @@ writeJSON = BL.putStr . JSON.toJsonBS
 
 ideaToJSON :: HLint.Idea -> JSON.Object
 ideaToJSON idea = JSON.row "command" "annotate-code"
-               <> JSON.row "row" row
-               <> JSON.row "column" column
-               <> JSON.row "type" (toString $ HLint.ideaSeverity idea)
-               <> JSON.row "rows" rows
-               <> JSON.row "columns" columns
-               <> JSON.row "text" (text (HLint.ideaHint idea) (HLint.ideaTo idea))
-    where (SrcSpan filename row column rows columns) = HLint.ideaSpan idea
+               <> JSON.row "type"    (toString $ HLint.ideaSeverity idea)
+               <> JSON.row "row"     (row1 - 2) -- module line + zero-based
+               <> JSON.row "rows"    (row2 - 2) -- module line + zero-based
+               <> JSON.row "column"  (column1 - 1) -- zero-based
+               <> JSON.row "columns" (column2 - 1) -- zero-based
+               <> JSON.row "text"    (text (HLint.ideaHint idea) (HLint.ideaTo idea))
+    where (SrcSpan filename row1 column1 row2 column2) = HLint.ideaSpan idea
           toString HLint.Suggestion = "info"
           toString HLint.Warning    = "warning"
           toString HLint.Error      = "error"
