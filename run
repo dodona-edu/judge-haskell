@@ -33,15 +33,6 @@ cat "$(jshon -e 'source' -u < "$config")" >> "Input.hs"
 # ==============================================================================
 # Helper functions for JSON generation
 
-compilation_error() {
-    jshon -Q -n object -s 'focus-relative' -i 'command' \
-                       -s 'root' -i 'level'
-    jshon -Q -n object -s 'set-properties' -i 'command'   \
-                       -s 'compilation error' -i 'status' \
-                       -s "$1" -i 'description'           \
-                       -n false -i 'accepted'
-}
-
 append_message() {
     jshon -Q -n object -s 'append-message' -i 'command'   \
                        -n object -s "$1" -i 'format'      \
