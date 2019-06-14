@@ -51,6 +51,10 @@ executeTestCase (TestCase d p) = writeTestCase =<< checkResult <$> quickCheckWit
                                                   JSON.row "description" (message result))
                             , JSON.row "command" "close-testcase" <>
                               JSON.row "accepted" (accepted result)
+                            , JSON.row "command" "escalate-status" <>
+                              JSON.row "status" (if accepted result
+                                then JSON.row "human" "Correct" <> JSON.row "enum" "correct"
+                                else JSON.row "human" "Wrong" <> JSON.row "enum" "wrong")
                             , JSON.row "command" "close-context"
                             ]
 
