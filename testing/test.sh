@@ -25,7 +25,8 @@ bash "../run" <<HERE
     "builddir": "$(pwd)/builddir",
     "time_limit": 30,
     "memory_limit": 100000000,
-    "source": "$path_to_exercise/solution/Input.hs"
+    "source": "$path_to_exercise/solution/Input.hs",
+    "helper": "$path_to_exercise/evaluation/Helper.hs"
 }
 HERE
 sed -i 's/stack ghc --/cabal exec -- ghc/' "../run"

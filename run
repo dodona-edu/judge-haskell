@@ -29,6 +29,7 @@ cd "$workdir"
 # Create the Input.hs module, containing the submitted code
 echo "module Input where" > "Input.hs"
 cat "$(jshon -e 'source' -u < "$config")" >> "Input.hs" 
+cp "$(jshon -e 'helper' -u < "$config")" . 
 
 # ==============================================================================
 # Helper functions for JSON generation
