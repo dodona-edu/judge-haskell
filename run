@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # ==============================================================================
 # Setup of environment
@@ -109,10 +109,10 @@ jshon -Q -n object -s 'close-tab' -i 'command'
 
 
 # Compiling and running each test file.
-while read testfile; do
+find "$resources" -name '*_test.hs' | while read testfile; do
     testbase="$(basename "$testfile")"
     testname="${testbase%_test.hs}"
-    tabtitle="${testname//_/ }"
+    tabtitle="$(echo "$testname" | tr '_' ' ')"
 
     jshon -Q -n object -s 'start-tab' -i 'command' \
                        -s "$tabtitle" -i 'title'
@@ -144,7 +144,7 @@ while read testfile; do
     rm runtest
 
     jshon -Q -n object -s 'close-tab' -i 'command'
-done < <(find "$resources" -name '*_test.hs')
+done
 
 jshon -Q -n object -s 'close-judgement' -i 'command'
 

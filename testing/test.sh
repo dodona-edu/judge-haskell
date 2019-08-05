@@ -17,7 +17,7 @@ mkdir builddir
     && find "$path_to_exercise/workdir/" -mindepth 1 -maxdepth 1 | xargs cp -r -t workdir
 
 sed -i 's/cabal exec -- ghc/stack ghc --/' "../run"
-bash "../run" <<HERE
+sh "../run" <<HERE
 {
     "resources": "$path_to_exercise/evaluation",
     "judge": "$(pwd)/..",
