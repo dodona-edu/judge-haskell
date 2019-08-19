@@ -11,12 +11,17 @@
 -- isEqual and complete failure
 --
 
+{-# LANGUAGE OverloadedStrings #-}
+
 module HUnitJudge where
 
 import Test.HUnit
 import Data.List (intercalate)
-import qualified Data.Json.Builder as JSON
-import qualified Data.ByteString as BL
+import Data.Aeson (encode, Value, (.=), object)
+import qualified Data.Text.Lazy.IO as T
+import qualified Data.Text.Lazy.Encoding as T
+import qualified Data.Text as T
+--import qualified Data.ByteString.Lazy as BL
 import Data.Monoid ((<>))
 import qualified System.IO as IO
 
@@ -34,27 +39,31 @@ myPutText = PutText reportMsg ()
 --
 -- Used by HUnit to generate output for an equality test
 --
-writeJSON :: JSON.Value a => a -> IO ()
-writeJSON = BL.putStr . JSON.toJsonBS
+writeJSON :: Value -> IO ()
+-- writeJSON = BL.putStr . encode
+writeJSON = T.putStr . T.decodeUtf8 . encode
+
+(.==) :: T.Text -> T.Text -> (T.Text, Value)
+(.==) = (.=)
 
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
 isEqual preface should actual = do
-    writeJSON $ JSON.row "command" "start-context"
-    writeJSON $ JSON.row "command" "start-testcase"
-             <> JSON.row "description" (JSON.row "format" "haskell" <> JSON.row "description" preface)
-    writeJSON $ JSON.row "command" "start-test"
-             <> JSON.row "expected" (show should)
+    writeJSON $ object [ "command" .== "start-context" ]
+    writeJSON $ object [ "command" .== "start-testcase"
+                       , "description" .= object [ "format" .== "haskell", "description" .= preface ] ]
+    writeJSON $ object [ "command" .== "start-test"
+                       , "expected" .= show should ]
     let accepted = should == actual
-    if accepted then writeJSON $ JSON.row "command" "close-test"
-                              <> JSON.row "generated" (show actual)
-                              <> JSON.row "accepted" True
-                              <> JSON.row "status" (JSON.row "enum" "correct" <> JSON.row "human" "Juist antwoord")
-                else writeJSON $ JSON.row "command" "close-test"
-                              <> JSON.row "generated" (show actual)
-                              <> JSON.row "accepted" False
-                              <> JSON.row "status" (JSON.row "enum" "wrong" <> JSON.row "human" "Fout antwoord")
-    writeJSON $ JSON.row "command" "close-testcase"
-    writeJSON $ JSON.row "command" "close-context"
+    if accepted then writeJSON $ object [ "command" .== "close-test"
+                                        , "generated" .= (show actual)
+                                        , "accepted" .= True
+                                        , "status" .= object [ "enum" .== "correct", "human" .== "Juist antwoord" ] ]
+                else writeJSON $ object [ "command" .== "close-test"
+                                        , "generated" .= (show actual)
+                                        , "accepted" .= False
+                                        , "status" .= object [ "enum" .== "wrong", "human" .== "Fout antwoord" ] ]
+    writeJSON $ object [ "command" .== "close-testcase" ]
+    writeJSON $ object [ "command" .== "close-context" ]
     assertBool "" accepted
 
 ---
@@ -99,9 +108,9 @@ runTestJSON (PutText put us0) t = do
       -- putStrLn $ show $ path ss
   reportFail loc msg ss count = return ()
   reportError loc msg ss count = do
-      writeJSON $ JSON.row "command" "close-test"
-               <> JSON.row "accepted" False
-               <> JSON.row "status" (JSON.row "enum" "runtime error" <> JSON.row "human" "Fout tijdens uitvoering")
-               <> JSON.row "generated" (show msg)
-      writeJSON $ JSON.row "command" "close-testcase"
-      writeJSON $ JSON.row "command" "close-context"
+      writeJSON $ object [ "command" .== "close-test"
+                         , "accepted" .= False
+                         , "status" .= object [ "enum" .== "runtime error", "human" .== "Fout tijdens uitvoering" ]
+                         , "generated" .= (show msg) ]
+      writeJSON $ object [ "command" .== "close-testcase" ]
+      writeJSON $ object [ "command" .== "close-context" ]
