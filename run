@@ -116,10 +116,12 @@ for testfile in "$resources/typecheck.hs" "$resources"/*_test.hs; do
     testname="${testname%_test}"
     tabtitle="$(echo "$testname" | tr '_' ' ')"
 
-    jshon -Q -n object -s 'start-tab' -i 'command' \
-                       -s "$tabtitle" -i 'title'
-
     # Compilation
+
+    jshon -Q -n object -s 'start-tab' -i 'command' \
+                       -s "$tabtitle" -i 'title' \
+                       -n true -i 'hidden'
+
     cp "$testfile" "$testbase"
     if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$testbase" -o runtest > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
@@ -137,12 +139,17 @@ for testfile in "$resources/typecheck.hs" "$resources"/*_test.hs; do
     fi
     rm "$testbase"
 
+    jshon -Q -n object -s 'close-tab' -i 'command'
+
     # Running the test
+
+    jshon -Q -n object -s 'start-tab' -i 'command' \
+                       -s "$tabtitle" -i 'title'
+
     set -e
     ./runtest
     set +e
 
-    # Cleanup
     rm runtest
 
     jshon -Q -n object -s 'close-tab' -i 'command'
