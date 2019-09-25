@@ -109,7 +109,10 @@ jshon -Q -n object -s 'close-tab' -i 'command'
 
 
 # Compiling and running each test file.
-find "$resources" -name '*_test.hs' | while read testfile; do
+testfiles="$(find "$resources" -name '*_test.hs' -print0)"
+while [ -n "$testfiles" ]; do
+    testfile="${testfiles##*\0}"
+    testfiles="${testfiles%\0*}"
     testbase="$(basename "$testfile")"
     testname="${testbase%_test.hs}"
     tabtitle="$(echo "$testname" | tr '_' ' ')"
