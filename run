@@ -107,19 +107,41 @@ fi
 jshon -Q -n object -s 'close-context' -i 'command'
 jshon -Q -n object -s 'close-tab' -i 'command'
 
+if [ -f "$resources/typecheck.hs" ]; then
+    jshon -Q -n object -s 'start-tab' -i 'command' \
+                       -s "$tabtitle" -i 'title' \
+                       -n true -i 'hidden'
+
+    if ! cabal exec -- ghc -outputdir "$builddir" "$resources/typecheck.hs" -o /dev/null > "$compilation" 2>&1; then
+        jshon -Q -n object -s 'start-context' -i 'command' \
+                           -s 'Compilatie' -i 'description'
+        append_message 'code' 'student' "$(cat "$compilation")"
+        jshon -Q -n object -s 'close-context' -i 'command' \
+                           -n false -i 'accepted'
+        jshon -Q -n object -s 'close-tab' -i 'command'
+        jshon -Q -n object -s 'close-judgement' -i 'command' \
+                           -n object -s 'compilation error' -i 'enum' \
+                                     -s 'Interface niet voldaan' -i 'human' \
+                                     -i 'status' \
+                           -n false -i 'accepted'
+        exit 0
+    fi
+
+    jshon -Q -n object -s 'close-tab' -i 'command'
+fi
 
 # Compiling and running each test file.
-for testfile in "$resources/typecheck.hs" "$resources"/*_test.hs; do
+for testfile in "$resources"/*_test.hs; do
     [ -f "$testfile" ] || continue
     testbase="$(basename "$testfile")"
-    testname="${testbase%.hs}"
-    testname="${testname%_test}"
+    testname="${testbase%_test.hs}"
     tabtitle="$(echo "$testname" | tr '_' ' ')"
 
-    # Compilation
+    # Compiling the test
 
     jshon -Q -n object -s 'start-tab' -i 'command' \
                        -s "$tabtitle" -i 'title' \
+                       -s 'staff' -i 'permission' \
                        -n true -i 'hidden'
 
     cp "$testfile" "$testbase"
@@ -131,8 +153,8 @@ for testfile in "$resources/typecheck.hs" "$resources"/*_test.hs; do
                            -n false -i 'accepted'
         jshon -Q -n object -s 'close-tab' -i 'command'
         jshon -Q -n object -s 'close-judgement' -i 'command' \
-                           -n object -s 'compilation error' -i 'enum' \
-                                     -s 'Interface niet voldaan' -i 'human' \
+                           -n object -s 'internal error' -i 'enum' \
+                                     -s 'Testcompilatie gefaald' -i 'human' \
                                      -i 'status' \
                            -n false -i 'accepted'
         exit 0
@@ -156,4 +178,3 @@ for testfile in "$resources/typecheck.hs" "$resources"/*_test.hs; do
 done
 
 jshon -Q -n object -s 'close-judgement' -i 'command'
-
