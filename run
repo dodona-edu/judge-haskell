@@ -145,7 +145,7 @@ for testfile in "$resources"/*_test.hs; do
                        -n true -i 'hidden'
 
     cp "$testfile" "$testbase"
-    if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$testbase" -o runtest > "$compilation" 2>&1; then
+    if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" -i"$resources" "$testbase" -o runtest > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
