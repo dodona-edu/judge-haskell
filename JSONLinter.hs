@@ -19,10 +19,10 @@ writeJSON = T.putStr . T.decodeUtf8 . encode
 ideaToJSON :: HLint.Idea -> Value
 ideaToJSON idea = object [ "command" .== "annotate-code"
                          , "type"    .= ((toString $ HLint.ideaSeverity idea) :: String)
-                         , "row"     .= (row1 - 2) -- module line + zero-based
-                         , "rows"    .= (row2 - 2) -- module line + zero-based
-                         , "column"  .= (column1 - 1) -- zero-based
-                         , "columns" .= (column2 - 1) -- zero-based
+                         , "row"     .= max 0 (row1 - 2) -- module line + zero-based
+                         , "rows"    .= max 0 (row2 - 2) -- module line + zero-based
+                         , "column"  .= max 0 (column1 - 1) -- zero-based
+                         , "columns" .= max 0 (column2 - 1) -- zero-based
                          , "text"    .= (text (HLint.ideaHint idea) (HLint.ideaTo idea)) ]
     where (SrcSpan filename row1 column1 row2 column2) = HLint.ideaSpan idea
           toString HLint.Suggestion = "info"
