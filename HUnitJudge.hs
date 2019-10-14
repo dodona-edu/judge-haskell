@@ -15,16 +15,14 @@
 
 module HUnitJudge where
 
-import Test.HUnit
-import Data.List (intercalate)
-import Data.Aeson (encode, Value, (.=), object)
-import qualified Data.Text.Lazy.IO as T
-import qualified Data.Text.Lazy.Encoding as T
+import           Data.Aeson (encode, Value, (.=), object)
+import           Data.List (intercalate)
+import           Data.Monoid ((<>))
 import qualified Data.Text as T
---import qualified Data.ByteString.Lazy as BL
-import Data.Monoid ((<>))
+import qualified Data.Text.Lazy.Encoding as T
+import qualified Data.Text.Lazy.IO as T
 import qualified System.IO as IO
-
+import           Test.HUnit (PutText(PutText), Assertion, Test(TestList, TestLabel), assertBool, performTest)
 
 --
 -- Helper function so that we can intercept
@@ -65,24 +63,6 @@ isEqual preface should actual = do
     writeJSON $ object [ "command" .== "close-testcase" ]
     writeJSON $ object [ "command" .== "close-context" ]
     assertBool "" accepted
-
----
---- Helper function to join strings with a space
----
-s_concat :: [String] -> String
-s_concat =  intercalate " "
-
----
---- Generation of testcases
----
-judge1 :: (Show t, Show a, Eq a) => [Char] -> (t -> a) -> (t -> a) -> [t] -> [Test]
-judge2 :: (Show t1, Show t, Show a, Eq a) => [Char] -> (t -> t1 -> a) -> (t -> t1 -> a) -> [(t, t1)] -> [Test]
-judge3 :: (Show t2, Show t1, Show t, Show a, Eq a) => [Char] -> (t -> t1 -> t2 -> a) -> (t -> t1 -> t2 -> a) -> [(t, t1, t2)] -> [Test]
-judge4 :: (Show t3, Show t2, Show t1, Show t, Show a, Eq a) => [Char] -> (t -> t1 -> t2 -> t3 -> a) -> (t -> t1 -> t2 -> t3 -> a) -> [(t, t1, t2, t3)] -> [Test]
-judge1 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x])                      (fs x)       (fi x))       | x         <- input ]
-judge2 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y])               (fs x y)     (fi x y))     | (x,y)     <- input ]
-judge3 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y,show z])        (fs x y z)   (fi x y z))   | (x,y,z)   <- input ]
-judge4 msg fs fi input = [ TestCase (isEqual (s_concat [msg,show x,show y,show z,show q]) (fs x y z q) (fi x y z q)) | (x,y,z,q) <- input ]
 
 makeTests :: [Test] -> Test
 makeTests list = TestList $ map (TestLabel "")   list
