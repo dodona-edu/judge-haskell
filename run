@@ -131,7 +131,11 @@ if [ -f "$resources/typecheck.hs" ]; then
 fi
 
 # Compiling and running each test file.
-for testfile in "$resources"/*_test.hs; do
+if [ -f "$resources/ordered_tests" ]
+then sed "s_^_$resources/_" < "$resources/ordered_tests" > "$builddir/ordered_tests"
+else echo "$resources"/*_test.hs > "$builddir/ordered_tests"
+fi
+for testfile in $(cat "$builddir/ordered_tests"); do
     [ -f "$testfile" ] || continue
     testbase="$(basename "$testfile")"
     testname="${testbase%_test.hs}"
