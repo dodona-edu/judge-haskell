@@ -132,7 +132,7 @@ fi
 
 # Compiling and running each test file.
 if [ -f "$resources/ordered_tests" ]
-then sed "s_^_$resources/_" < "$resources/ordered_tests" > "$builddir/ordered_tests"
+then sed "s|^|$resources/|" < "$resources/ordered_tests" > "$builddir/ordered_tests"
 else echo "$resources"/*_test.hs > "$builddir/ordered_tests"
 fi
 for testfile in $(cat "$builddir/ordered_tests"); do
