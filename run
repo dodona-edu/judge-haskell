@@ -49,7 +49,7 @@ append_message() {
 jshon -Q -n object -s 'start-judgement' -i 'command'
 
 # Compiling the judge code
-if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HUnitJudge.hs" > "$compilation" 2>&1; then
+if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge/src" "$judge/src/HUnitJudge.hs" > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
@@ -59,7 +59,7 @@ if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HUnitJudge.hs" 
     exit 0
 fi
 
-if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/QuickCheckJudge.hs" > "$compilation" 2>&1; then
+if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge/src" "$judge/src/QuickCheckJudge.hs" > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
@@ -69,7 +69,7 @@ if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/QuickCheckJudge
     exit 0
 fi
 
-if ! cabal exec -- ghc -outputdir "$builddir" -o "$builddir/JSONLinter" -i"$judge" "$judge/JSONLinter.hs" > "$compilation" 2>&1; then
+if ! cabal exec -- ghc -package ghc-lib-parser -outputdir "$builddir" -o "$builddir/JSONLinter" -i"$judge/src" "$judge/src/JSONLinter.hs" > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
@@ -149,7 +149,7 @@ for testfile in $(cat "$builddir/ordered_tests"); do
                        -n true -i 'hidden'
 
     cp "$testfile" "$testbase"
-    if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" -i"$resources" "$testbase" -o runtest > "$compilation" 2>&1; then
+    if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge/src" -i"$resources" "$testbase" -o runtest > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
