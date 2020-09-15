@@ -16,7 +16,6 @@ mkdir builddir
 [ -d "$path_to_exercise/workdir" ] \
     && find "$path_to_exercise/workdir/" -mindepth 1 -maxdepth 1 | xargs cp -r -t workdir
 
-sed -i 's/cabal exec -- ghc/stack ghc --/' "../run"
 sh "../run" <<HERE
 {
     "resources": "$path_to_exercise/evaluation",
@@ -29,5 +28,3 @@ sh "../run" <<HERE
     "helper": "$path_to_exercise/evaluation/Helper.hs"
 }
 HERE
-sed -i 's/stack ghc --/cabal exec -- ghc/' "../run"
-

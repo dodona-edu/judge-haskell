@@ -15,21 +15,11 @@ cat > "$config"
 resources="$(jshon -e 'resources' -u < "$config")"
 judge="$(jshon -e 'judge' -u < "$config")"
 workdir="$(jshon -e 'workdir' -u < "$config")"
-builddir="$(jshon -e 'builddir' -u < "$config")"
-builddir="${builddir:-/tmp/outputdir}"
+#STACK_WORK="$(jshon -e 'builddir' -u < "$config")"
+#export STACK_WORK="${STACK_WORK:-/$workdir}"
+builddir="$workdir"
 
-# Compilation directory
-mkdir -p "$builddir"
-
-trap "rm -rf '$config' '$result' '$compilation' '$execution' '$builddir'" EXIT
-
-# All our code should be executed in the workdir
-cd "$workdir"
-
-# Create the Input.hs module, containing the submitted code
-echo "module Input where" > "Input.hs"
-cat "$(jshon -e 'source' -u < "$config")" >> "Input.hs" 
-cp "$(jshon -e 'helper' -u < "$config")" .  2>/dev/null
+trap "rm -rf '$config' '$result' '$compilation' '$execution' '$STACK_WORK'" EXIT
 
 # ==============================================================================
 # Helper functions for JSON generation
@@ -49,7 +39,9 @@ append_message() {
 jshon -Q -n object -s 'start-judgement' -i 'command'
 
 # Compiling the judge code
-if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HUnitJudge.hs" > "$compilation" 2>&1; then
+cd "$judge"
+
+if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
@@ -59,27 +51,12 @@ if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/HUnitJudge.hs" 
     exit 0
 fi
 
-if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" "$judge/QuickCheckJudge.hs" > "$compilation" 2>&1; then
-    append_message 'code' 'staff' "$(cat "$compilation")"
-    jshon -Q -n object -s 'close-judgement' -i 'command' \
-                       -n object -s 'internal error' -i 'enum' \
-                                 -s 'Compilatie judge mislukt' -i 'human' \
-                                 -i 'status' \
-                       -n false -i 'accepted'
-    exit 0
-fi
+# Create the Input.hs module, containing the submitted code
+cat "$(jshon -e 'source' -u < "$config")" >> lib/Input.hs
+cp "$(jshon -e 'helper' -u < "$config")" .  2>/dev/null
 
-if ! cabal exec -- ghc -outputdir "$builddir" -o "$builddir/JSONLinter" -i"$judge" "$judge/JSONLinter.hs" > "$compilation" 2>&1; then
-    append_message 'code' 'staff' "$(cat "$compilation")"
-    jshon -Q -n object -s 'close-judgement' -i 'command' \
-                       -n object -s 'internal error' -i 'enum' \
-                                 -s 'Compilatie judge mislukt' -i 'human' \
-                                 -i 'status' \
-                       -n false -i 'accepted'
-    exit 0
-fi
-
-"$builddir/JSONLinter" "Input.hs"
+# Lint the user code.
+stack run jsonlinter lib/Input.hs
 
 # Compiling the user code.
 jshon -Q -n object -s 'start-tab' -i 'command' \
@@ -91,7 +68,7 @@ jshon -Q -n object -s 'start-context' -i 'command' \
                              -s "ghc Input.hs" -i 'description' \
                              -i 'description'
 
-if ! cabal exec -- ghc -outputdir "$builddir" "Input.hs" > "$compilation" 2>&1; then
+if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
     append_message 'code' 'student' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-context' -i 'command' \
                        -n false -i 'accepted'
@@ -109,10 +86,11 @@ jshon -Q -n object -s 'close-tab' -i 'command'
 
 if [ -f "$resources/typecheck.hs" ]; then
     jshon -Q -n object -s 'start-tab' -i 'command' \
-                       -s "$tabtitle" -i 'title' \
+                       -s "Typecheck" -i 'title' \
                        -n true -i 'hidden'
 
-    if ! cabal exec -- ghc -outputdir "$builddir" "$resources/typecheck.hs" -o /dev/null > "$compilation" 2>&1; then
+    cat "$resources/typecheck.hs" >> lib/Typecheck.hs
+    if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
@@ -148,8 +126,8 @@ for testfile in $(cat "$builddir/ordered_tests"); do
                        -s 'staff' -i 'permission' \
                        -n true -i 'hidden'
 
-    cp "$testfile" "$testbase"
-    if ! cabal exec -- ghc -outputdir "$builddir" -i"$judge" -i"$resources" "$testbase" -o runtest > "$compilation" 2>&1; then
+    cp "$testfile" src/Test.hs
+    if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
@@ -163,7 +141,6 @@ for testfile in $(cat "$builddir/ordered_tests"); do
                            -n false -i 'accepted'
         exit 0
     fi
-    rm "$testbase"
 
     jshon -Q -n object -s 'close-tab' -i 'command'
 
@@ -173,10 +150,8 @@ for testfile in $(cat "$builddir/ordered_tests"); do
                        -s "$tabtitle" -i 'title'
 
     set -e
-    ./runtest
+    stack run --cwd "$workdir" test
     set +e
-
-    rm runtest
 
     jshon -Q -n object -s 'close-tab' -i 'command'
 done
