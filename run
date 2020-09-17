@@ -5,7 +5,7 @@
 
 # Temp files
 config="$(mktemp)"      # configuration
-result="$(mktemp)"      # result json
+order="$(mktemp)"       # order
 compilation="$(mktemp)" # output of compilation
 
 # Saving the configuration from stdin
@@ -15,11 +15,9 @@ cat > "$config"
 resources="$(jshon -e 'resources' -u < "$config")"
 judge="$(jshon -e 'judge' -u < "$config")"
 workdir="$(jshon -e 'workdir' -u < "$config")"
-#STACK_WORK="$(jshon -e 'builddir' -u < "$config")"
-#export STACK_WORK="${STACK_WORK:-/$workdir}"
 builddir="$workdir"
 
-trap "rm -rf '$config' '$result' '$compilation' '$execution' '$STACK_WORK'" EXIT
+trap "rm -rf '$config' '$order' '$compilation' '$execution' '$STACK_WORK'" EXIT
 
 # ==============================================================================
 # Helper functions for JSON generation
@@ -41,7 +39,7 @@ jshon -Q -n object -s 'start-judgement' -i 'command'
 # Compiling the judge code
 cd "$judge"
 
-if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
+if ! cabal build --offline > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
@@ -56,7 +54,7 @@ cat "$(jshon -e 'source' -u < "$config")" >> lib/Input.hs
 cp "$(jshon -e 'helper' -u < "$config")" .  2>/dev/null
 
 # Lint the user code.
-stack run jsonlinter lib/Input.hs
+cabal run --offline jsonlinter lib/Input.hs
 
 # Compiling the user code.
 jshon -Q -n object -s 'start-tab' -i 'command' \
@@ -68,7 +66,7 @@ jshon -Q -n object -s 'start-context' -i 'command' \
                              -s "ghc Input.hs" -i 'description' \
                              -i 'description'
 
-if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
+if ! cabal build --offline > "$compilation" 2>&1; then
     append_message 'code' 'student' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-context' -i 'command' \
                        -n false -i 'accepted'
@@ -90,7 +88,7 @@ if [ -f "$resources/typecheck.hs" ]; then
                        -n true -i 'hidden'
 
     cat "$resources/typecheck.hs" >> lib/Typecheck.hs
-    if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
+    if ! cabal build --offline > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
@@ -110,10 +108,10 @@ fi
 
 # Compiling and running each test file.
 if [ -f "$resources/ordered_tests" ]
-then sed "s|^|$resources/|" < "$resources/ordered_tests" > "$builddir/ordered_tests"
-else echo "$resources"/*_test.hs > "$builddir/ordered_tests"
+then sed "s|^|$resources/|" < "$resources/ordered_tests" > "$order"
+else echo "$resources"/*_test.hs > "$order"
 fi
-for testfile in $(cat "$builddir/ordered_tests"); do
+for testfile in $(cat "$order"); do
     [ -f "$testfile" ] || continue
     testbase="$(basename "$testfile")"
     testname="${testbase%_test.hs}"
@@ -127,7 +125,7 @@ for testfile in $(cat "$builddir/ordered_tests"); do
                        -n true -i 'hidden'
 
     cp "$testfile" src/Test.hs
-    if ! stack build --system-ghc --no-install-ghc > "$compilation" 2>&1; then
+    if ! cabal install --installdir="$workdir" --offline test > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
@@ -150,7 +148,9 @@ for testfile in $(cat "$builddir/ordered_tests"); do
                        -s "$tabtitle" -i 'title'
 
     set -e
-    stack run --cwd "$workdir" test
+    cd "$workdir"
+    ./test
+    cd "$judge"
     set +e
 
     jshon -Q -n object -s 'close-tab' -i 'command'
