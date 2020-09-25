@@ -15,9 +15,12 @@ cat > "$config"
 resources="$(jshon -e 'resources' -u < "$config")"
 judge="$(jshon -e 'judge' -u < "$config")"
 workdir="$(jshon -e 'workdir' -u < "$config")"
-builddir="$workdir"
+builddir="$(mktemp -d -p /dev/shm)"
 
-trap "rm -rf '$config' '$order' '$compilation' '$execution' '$STACK_WORK'" EXIT
+trap "rm -rf '$config' '$order' '$compilation' '$execution' '$builddir'" EXIT
+
+# Searching the environment
+pkgdb="$(find "$HOME/.cabal/store" -name package.db -print -quit)"
 
 # ==============================================================================
 # Helper functions for JSON generation
@@ -39,7 +42,7 @@ jshon -Q -n object -s 'start-judgement' -i 'command'
 # Compiling the judge code
 cd "$judge"
 
-if ! cabal install --installdir="." -j1 --offline > "$compilation" 2>&1; then
+if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
     append_message 'code' 'staff' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-judgement' -i 'command' \
                        -n object -s 'internal error' -i 'enum' \
@@ -50,11 +53,12 @@ if ! cabal install --installdir="." -j1 --offline > "$compilation" 2>&1; then
 fi
 
 # Create the Input.hs module, containing the submitted code
+echo 'module Input where' > lib/Input.hs
 cat "$(jshon -e 'source' -u < "$config")" >> lib/Input.hs
 cp "$(jshon -e 'helper' -u < "$config")" .  2>/dev/null
 
 # Lint the user code.
-./jsonlinter lib/Input.hs
+runghc -package-db --ghc-arg="$pkgdb" src/JSONLinter.hs lib/Input.hs
 
 # Compiling the user code.
 jshon -Q -n object -s 'start-tab' -i 'command' \
@@ -66,7 +70,7 @@ jshon -Q -n object -s 'start-context' -i 'command' \
                              -s "ghc Input.hs" -i 'description' \
                              -i 'description'
 
-if ! cabal build -j1 --offline > "$compilation" 2>&1; then
+if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
     append_message 'code' 'student' "$(cat "$compilation")"
     jshon -Q -n object -s 'close-context' -i 'command' \
                        -n false -i 'accepted'
@@ -87,8 +91,9 @@ if [ -f "$resources/typecheck.hs" ]; then
                        -s "Typecheck" -i 'title' \
                        -n true -i 'hidden'
 
+    echo 'module Typecheck where' > lib/Typecheck.hs
     cat "$resources/typecheck.hs" >> lib/Typecheck.hs
-    if ! cabal build -j1 --offline > "$compilation" 2>&1; then
+    if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
@@ -125,7 +130,7 @@ for testfile in $(cat "$order"); do
                        -n true -i 'hidden'
 
     cp "$testfile" src/Test.hs
-    if ! cabal install -j1 --installdir="$workdir" --offline test > "$compilation" 2>&1; then
+    if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" -c src/Test.hs > "$compilation" 2>&1; then
         jshon -Q -n object -s 'start-context' -i 'command' \
                            -s 'Compilatie' -i 'description'
         append_message 'code' 'student' "$(cat "$compilation")"
@@ -149,7 +154,7 @@ for testfile in $(cat "$order"); do
 
     set -e
     cd "$workdir"
-    ./test
+    runghc -package-db --ghc-arg="$pkgdb" -i"$builddir":"$judge"/lib "$judge"/src/Test.hs
     cd "$judge"
     set +e
 
