@@ -24,31 +24,24 @@ pkgdb="$(find "$HOME/.cabal/store" -name package.db -print -quit)"
 
 # ==============================================================================
 # Helper functions for JSON generation
+dodona() { "$judge/dodona" "$@"; }
 
 append_message() {
-    jshon -Q -n object -s 'append-message' -i 'command'   \
-                       -n object -s "$1" -i 'format'      \
-                                 -s "$2" -i 'permission'  \
-                                 -s "$3" -i 'description' \
-                                 -i 'message'
+    dodona append-message -f "$1" -p "$2" -d "$3"
 }
 
 # ==============================================================================
 # Compiling and running tests.
 
 # Let's get started
-jshon -Q -n object -s 'start-judgement' -i 'command'
+dodona start-judgement
 
 # Compiling the judge code
 cd "$judge"
 
 if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-    append_message 'code' 'staff' "$(cat "$compilation")"
-    jshon -Q -n object -s 'close-judgement' -i 'command' \
-                       -n object -s 'internal error' -i 'enum' \
-                                 -s 'Compilatie judge mislukt' -i 'human' \
-                                 -i 'status' \
-                       -n false -i 'accepted'
+    dodona append-message -f code -p staff -d "$(cat "$compilation")"
+    dodona close-judgement -A -e 'internal error' -h 'Compilatie judge mislukt'
     exit 0
 fi
 
@@ -61,54 +54,38 @@ cp "$(jshon -e 'helper' -u < "$config")" .  2>/dev/null
 runghc -package-db --ghc-arg="$pkgdb" src/JSONLinter.hs lib/Input.hs
 
 # Compiling the user code.
-jshon -Q -n object -s 'start-tab' -i 'command' \
-                   -s 'compilatie' -i 'title' \
-                   -n true -i 'hidden'
-
-jshon -Q -n object -s 'start-context' -i 'command' \
-                   -n object -s "code" -i 'format' \
-                             -s "ghc Input.hs" -i 'description' \
-                             -i 'description'
-
+dodona start-tab -h -t 'compilatie'
+dodona start-context -f code -d "ghc Input.hs"
 if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-    append_message 'code' 'student' "$(cat "$compilation")"
-    jshon -Q -n object -s 'close-context' -i 'command' \
-                       -n false -i 'accepted'
-    jshon -Q -n object -s 'close-tab' -i 'command'
-    jshon -Q -n object -s 'close-judgement' -i 'command' \
-                       -n object -s 'compilation error' -i 'enum' \
-                                 -s 'Compilatie mislukt' -i 'human' \
-                                 -i 'status' \
-                       -n false -i 'accepted'
+    dodona append-message -f code -d "$(cat "$compilation")"
+    dodona close-context -A
+    dodona close-tab
+    dodona close-judgement -A -e 'compilation error' -h 'Compilatie mislukt'
     exit 0
 fi
+dodona close-context
+dodona close-tab
 
-jshon -Q -n object -s 'close-context' -i 'command'
-jshon -Q -n object -s 'close-tab' -i 'command'
+# Copy over non-testfiles
+find "$resources" \
+    -name '*.hs' \
+    -not -name '*_test.hs' \
+    -not -name 'typecheck.hs' \
+    -exec cp \{\} lib \;
 
 if [ -f "$resources/typecheck.hs" ]; then
-    jshon -Q -n object -s 'start-tab' -i 'command' \
-                       -s "Typecheck" -i 'title' \
-                       -n true -i 'hidden'
-
+    dodona start-tab -h -t 'Typecheck'
     echo 'module Typecheck where' > lib/Typecheck.hs
     cat "$resources/typecheck.hs" >> lib/Typecheck.hs
     if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-        jshon -Q -n object -s 'start-context' -i 'command' \
-                           -s 'Compilatie' -i 'description'
-        append_message 'code' 'student' "$(cat "$compilation")"
-        jshon -Q -n object -s 'close-context' -i 'command' \
-                           -n false -i 'accepted'
-        jshon -Q -n object -s 'close-tab' -i 'command'
-        jshon -Q -n object -s 'close-judgement' -i 'command' \
-                           -n object -s 'compilation error' -i 'enum' \
-                                     -s 'Interface niet voldaan' -i 'human' \
-                                     -i 'status' \
-                           -n false -i 'accepted'
+        dodona start-context -f plain -d 'Compilatie'
+        dodona append-message -f code -d "$(cat "$compilation")"
+        dodona close-context -A
+        dodona close-tab
+        dodona close-judgement -A -e 'compilation error' -h 'Interface niet voldaan'
         exit 0
     fi
-
-    jshon -Q -n object -s 'close-tab' -i 'command'
+    dodona close-tab
 fi
 
 # Compiling and running each test file.
@@ -123,42 +100,26 @@ for testfile in $(cat "$order"); do
     tabtitle="$(echo "$testname" | tr '_' ' ')"
 
     # Compiling the test
-
-    jshon -Q -n object -s 'start-tab' -i 'command' \
-                       -s "$tabtitle" -i 'title' \
-                       -s 'staff' -i 'permission' \
-                       -n true -i 'hidden'
-
+    dodona start-tab -p staff -h -t "$tabtitle"
     cp "$testfile" src/Test.hs
     if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" -c src/Test.hs > "$compilation" 2>&1; then
-        jshon -Q -n object -s 'start-context' -i 'command' \
-                           -s 'Compilatie' -i 'description'
-        append_message 'code' 'student' "$(cat "$compilation")"
-        jshon -Q -n object -s 'close-context' -i 'command' \
-                           -n false -i 'accepted'
-        jshon -Q -n object -s 'close-tab' -i 'command'
-        jshon -Q -n object -s 'close-judgement' -i 'command' \
-                           -n object -s 'internal error' -i 'enum' \
-                                     -s 'Testcompilatie gefaald' -i 'human' \
-                                     -i 'status' \
-                           -n false -i 'accepted'
+        dodona start-context -f plain -d 'Compilatie'
+        dodona append-message -f code -d "$(cat "$compilation")"
+        dodona close-context -A
+        dodona close-tab
+        dodona close-judgement -A -e 'internal error' -h 'Testcompilatie gefaald'
         exit 0
     fi
-
-    jshon -Q -n object -s 'close-tab' -i 'command'
+    dodona close-tab
 
     # Running the test
-
-    jshon -Q -n object -s 'start-tab' -i 'command' \
-                       -s "$tabtitle" -i 'title'
-
+    dodona start-tab -t "$tabtitle"
     set -e
     cd "$workdir"
     runghc -package-db --ghc-arg="$pkgdb" -i"$builddir":"$judge"/lib "$judge"/src/Test.hs
     cd "$judge"
     set +e
-
-    jshon -Q -n object -s 'close-tab' -i 'command'
+    dodona close-tab
 done
 
-jshon -Q -n object -s 'close-judgement' -i 'command'
+dodona close-judgement
