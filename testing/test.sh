@@ -10,11 +10,17 @@ if ! [[ "$path_to_exercise" = /* ]]; then
     path_to_exercise="$(pwd)/$path_to_exercise"
 fi
 
+if ! git diff --quiet ../run; then
+    echo 'Requires a clean ../run'
+fi
+
 mkdir workdir
 mkdir builddir
 
 [ -d "$path_to_exercise/workdir" ] \
     && find "$path_to_exercise/workdir/" -mindepth 1 -maxdepth 1 | xargs cp -r -t workdir
+
+( cd ..; git apply testing/run.diff; )
 
 sh "../run" <<HERE
 {
