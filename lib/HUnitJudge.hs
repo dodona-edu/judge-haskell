@@ -16,6 +16,7 @@
 module HUnitJudge where
 
 import           Data.Aeson (encode, Value, (.=), object)
+import           Data.Aeson.Key (Key, fromText)
 import           Data.List (intercalate)
 import           Data.Monoid ((<>))
 import qualified Data.Text as T
@@ -41,8 +42,8 @@ writeJSON :: Value -> IO ()
 -- writeJSON = BL.putStr . encode
 writeJSON = T.putStr . T.decodeUtf8 . encode
 
-(.==) :: T.Text -> T.Text -> (T.Text, Value)
-(.==) = (.=)
+(.==) :: T.Text -> T.Text -> (Key, Value)
+(.==) k = (.=) (fromText k)
 
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
 isEqual preface should actual = do

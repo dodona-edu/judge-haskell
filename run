@@ -116,7 +116,7 @@ for testfile in $(cat "$order"); do
     dodona start-tab -t "$tabtitle"
     set -e
     cd "$workdir"
-    runghc -package-db --ghc-arg="$pkgdb" -i"$builddir":"$judge"/lib "$judge"/src/Test.hs
+    runghc -w -package-db --ghc-arg="$pkgdb" -i"$builddir":"$judge"/lib "$judge"/src/Test.hs
     cd "$judge"
     set +e
     dodona close-tab
