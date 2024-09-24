@@ -20,7 +20,7 @@ builddir="$(mktemp -d -p /dev/shm)"
 trap "rm -rf '$config' '$order' '$compilation' '$execution' '$builddir'" EXIT
 
 # Searching the environment
-pkgdb="$(find "$HOME/.cabal/store" -name package.db -print -quit)"
+pkgdb="$(find "$HOME/.local/state/cabal/store" -name package.db -print -quit)"
 
 # ==============================================================================
 # Helper functions for JSON generation
