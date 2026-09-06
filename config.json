@@ -1,4 +1,5 @@
 {
     "judge": "haskell",
-    "image": "dodona-haskell"
+    "image": "dodona-haskell",
+    "memory_limit": 512000000
 }
