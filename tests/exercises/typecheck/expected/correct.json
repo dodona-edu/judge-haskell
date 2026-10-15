@@ -1,0 +1,112 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "Typecheck"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "square"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "square"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "square 3",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "9"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "9",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "square (-4)",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "16"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "16",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}

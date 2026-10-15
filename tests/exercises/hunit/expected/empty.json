@@ -1,0 +1,62 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "double"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "Compilatie",
+        "format": "plain"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "\nsrc/Test.hs:7:42: error: [GHC-88464]\n    Variable not in scope: double :: [a4] -> [a5]\n  |\n7 |     [ TestCase $ isEqual \"double []\" [] (double [])\n  |                                          ^^^^^^\n\nsrc/Test.hs:8:56: error: [GHC-88464]\n    Variable not in scope: double :: [a2] -> [a3]\n  |\n8 |     , TestCase $ isEqual \"double [1, 2, 3]\" [2, 4, 6] (double [1, 2, 3])\n  |                                                        ^^^^^^\n\nsrc/Test.hs:9:47: error: [GHC-88464]\n    Variable not in scope: double :: [a0] -> [a1]\n  |\n9 |     , TestCase $ isEqual \"double [-5]\" [-10] (double [-5])\n  |                                               ^^^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "internal error",
+        "human": "Testcompilatie gefaald"
+      }
+    }
+  ],
+  "stderr": ""
+}

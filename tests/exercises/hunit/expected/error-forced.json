@@ -1,0 +1,133 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "double"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "double"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double []",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[]"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "\"/mnt/SANDBOX/judge/lib/Input.hs:3:1-33: Non-exhaustive patterns in function double\\n\"",
+      "status": {
+        "enum": "runtime error",
+        "human": "Fout tijdens uitvoering"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [1, 2, 3]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[2,4,6]"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "\"/mnt/SANDBOX/judge/lib/Input.hs:3:1-33: Non-exhaustive patterns in function double\\n\"",
+      "status": {
+        "enum": "runtime error",
+        "human": "Fout tijdens uitvoering"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [-5]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[-10]"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "\"/mnt/SANDBOX/judge/lib/Input.hs:3:1-33: Non-exhaustive patterns in function double\\n\"",
+      "status": {
+        "enum": "runtime error",
+        "human": "Fout tijdens uitvoering"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}

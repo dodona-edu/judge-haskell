@@ -1,0 +1,61 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "Typecheck"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "Compilatie",
+        "format": "plain"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "[4 of 5] Compiling Typecheck        ( lib/Typecheck.hs, /dev/shm/TMP/Typecheck.o )\n\nlib/Typecheck.hs:5:14: error: [GHC-83865]\n    • Couldn't match type ‘Double’ with ‘Int’\n      Expected: Int -> Int\n        Actual: Double -> Double\n    • In the expression: square\n      In an equation for ‘squareType’: squareType = square\n  |\n5 | squareType = square\n  |              ^^^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "compilation error",
+        "human": "Interface niet voldaan"
+      }
+    }
+  ],
+  "stderr": ""
+}

@@ -1,0 +1,108 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "absolute"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "absolute"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "absolute n >= 0",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "+++ OK, passed 100 tests.\n",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": true,
+      "command": "close-testcase"
+    },
+    {
+      "command": "escalate-status",
+      "status": {
+        "enum": "correct",
+        "human": "Correct"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "absolute (absolute n) == absolute n",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "+++ OK, passed 100 tests.\n",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": true,
+      "command": "close-testcase"
+    },
+    {
+      "command": "escalate-status",
+      "status": {
+        "enum": "correct",
+        "human": "Correct"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}

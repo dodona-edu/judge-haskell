@@ -1,0 +1,157 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "Typecheck"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "word count"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "word count"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "countWords <words.txt>",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "9"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "2",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "countWords \"\"",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "0"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "0",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "longest"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "longest"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "longestWord <words.txt>",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "\"jumps\""
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "\"the\"",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}
