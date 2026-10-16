@@ -96,6 +96,7 @@ run_case() { # $1 = exercise dir, $2 = case name, $3 = file to write the result 
     rm -rf "$root"
 }
 
+ghc_version="$(ghc --numeric-version | cut -d. -f1,2)"
 passed=0
 failed=0
 updated=0
@@ -106,6 +107,8 @@ for submission in "$repo"/tests/exercises/*/submissions/*.hs; do
     [[ "$name" == *"$filter"* ]] || continue
 
     expected="$exercise/expected/$case.json"
+    variant="$exercise/expected/$case.ghc-$ghc_version.json"
+    [ -f "$variant" ] && expected="$variant"
     actual="$(mktemp)"
     run_case "$exercise" "$case" "$actual"
     if [ "${UPDATE_EXPECTED:-}" = 1 ]; then
