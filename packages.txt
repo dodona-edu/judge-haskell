@@ -1,13 +1,13 @@
-# Mirror of the libraries docker-images' dodona-haskell.dockerfile installs; CI checks it against the image.
+# Libraries the judge and its exercises use; judge-haskell keeps an identical copy, checked in CI.
 HUnit-1.6.2.0
 MissingH-1.6.0.1
 QuickCheck-2.14.3
-ghc-lib-parser-9.8.2.20240223
-ghc-lib-parser-ex-9.8.0.2
+ghc-lib-parser-9.12.3.20251228
+ghc-lib-parser-ex-9.12.0.0
 gloss-1.13.2.2
-hlint-3.8
-splitmix-0.1.0.5
-# Imported by the judge; the image only gets it through hlint.
-aeson-2.2.3.0
-# Boot package, listed because the package environment only exposes packages it names.
-text-2.1.1
+hlint-3.10
+splitmix-0.1.1
+# Imported by the judge directly.
+aeson-2.2.5.1
+# Boot package, listed so a package environment exposes it.
+text-2.1.4
