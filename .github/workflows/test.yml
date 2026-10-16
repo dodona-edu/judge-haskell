@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Read the tool versions
+        id: versions
+        run: awk '{ print $1 "=" $2 }' .tool-versions >> "$GITHUB_OUTPUT"
+      - name: Setup GHC and cabal
+        id: setup
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ steps.versions.outputs.ghc }}
+          cabal-version: ${{ steps.versions.outputs.cabal }}
+          cabal-update: false
+      - name: Install the C libraries gloss builds against
+        run: sudo apt-get update && sudo apt-get install -y freeglut3-dev
+      - name: Cache the cabal store and package index
+        uses: actions/cache@v6
+        with:
+          # setup puts cabal in non-XDG mode, so the index lives in ~/.cabal/packages
+          path: |
+            ${{ steps.setup.outputs.cabal-store }}
+            ~/.cabal/packages
+          key: test-${{ runner.os }}-${{ hashFiles('.tool-versions', 'packages.txt', 'packages-test.txt') }}
+          restore-keys: test-${{ runner.os }}-
+      - name: Install the packages.txt and packages-test.txt libraries
+        run: ./devel/install_deps.sh packages-test.txt
+      - name: Run the unit tests
+        run: ./devel/run-unit-tests.sh
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Read the tool versions
+        id: versions
+        run: awk '{ print $1 "=" $2 }' .tool-versions >> "$GITHUB_OUTPUT"
+      - name: Setup GHC and cabal
+        id: setup
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: ${{ steps.versions.outputs.ghc }}
+          cabal-version: ${{ steps.versions.outputs.cabal }}
+          cabal-update: false
+      - name: Cache the cabal store and package index
+        uses: actions/cache@v6
+        with:
+          path: |
+            ${{ steps.setup.outputs.cabal-store }}
+            ~/.cabal/packages
+          key: lint-${{ runner.os }}-${{ hashFiles('.tool-versions', 'packages-dev.txt') }}
+          restore-keys: lint-${{ runner.os }}-
+      - name: Install the packages-dev.txt tools
+        run: ./devel/install_dev_deps.sh
+      - name: Run the linter
+        run: ./devel/check.sh

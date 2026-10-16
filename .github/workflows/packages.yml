@@ -1,0 +1,16 @@
+name: Packages
+
+on:
+  push:
+
+jobs:
+  packages-match-image:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dodona-edu/dodona-haskell:latest
+      options: --user root
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check packages.txt and .tool-versions against the image
+        run: ./devel/packages_match_image.sh

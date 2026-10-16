@@ -31,3 +31,26 @@ CI runs the suite on every push in `ghcr.io/dodona-edu/dodona-haskell:latest`
 (`.github/workflows/integration_test.yml`). `.github/workflows/e2e.yml` takes
 the image and judge ref as inputs, so docker-images can verify a new image
 against the suite before publishing it.
+
+### Dependencies
+
+The judge image owns the runtime dependencies; `packages.txt` is a checked copy of its library list.
+
+```sh
+devel/install_deps.sh                    # GHC package environment with packages.txt
+devel/install_deps.sh packages-test.txt  # the same, plus the unit test libraries
+devel/install_dev_deps.sh                # hlint, into cabal's installdir
+```
+
+### Unit tests and lint
+
+`knownBug "#N ..."` asserts the intended behaviour for a filed bug: the example
+is pending while the bug is there and fails once it is fixed, so the marker gets
+removed with the fix.
+
+```sh
+devel/run-unit-tests.sh      # after devel/install_deps.sh packages-test.txt; arguments go to hspec
+devel/check.sh               # hlint on lib/, src/ and tests/unit/, after devel/install_dev_deps.sh
+```
+
+`test.yml` builds a fresh environment from the lists and runs the unit tests and lint; `packages.yml` (`packages-match-image`) checks `packages.txt` and `.tool-versions` against the image.

@@ -1,0 +1,5 @@
+# Hints production code already triggers; JSONLinter has no module header, so its functions are in Main.
+- ignore: {name: Eta reduce, within: [HUnitJudge.reportMsg]}
+- ignore: {name: Redundant bracket, within: [HUnitJudge.isEqual, HUnitJudge.runTestJSON, Main.ideaToJSON]}
+- ignore: {name: Redundant <$>, within: [QuickCheckJudge.executeTestCase, Main.lint]}
+- ignore: {name: Use unwords, within: [Utils.sjoin]}
