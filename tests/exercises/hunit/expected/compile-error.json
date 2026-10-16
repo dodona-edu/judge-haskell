@@ -1,0 +1,43 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "[2 of 4] Compiling Input            ( lib/Input.hs, /dev/shm/TMP/Input.o )\n\nlib/Input.hs:3:26: error: [GHC-88464]\n    Variable not in scope: (+++) :: [Int] -> [a0] -> [Int]\n    Suggested fix: Perhaps use ‘++’ (imported from Prelude)\n  |\n3 | double xs = map (* 2) xs +++ []\n  |                          ^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "compilation error",
+        "human": "Compilatie mislukt"
+      }
+    }
+  ],
+  "stderr": ""
+}

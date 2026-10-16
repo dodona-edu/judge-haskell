@@ -1,0 +1,75 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "picture"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "picture"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "target",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "Pictures [Circle 10.0,Color (RGBA 1.0 0.0 0.0 1.0) (Circle 20.0)]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "Pictures [Circle 10.0,Color (RGBA 1.0 0.0 0.0 1.0) (Circle 20.0)]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}

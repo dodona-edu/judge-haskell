@@ -1,0 +1,169 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "column": 0,
+      "columns": 34,
+      "command": "annotate-code",
+      "row": 1,
+      "rows": 1,
+      "text": "Eta reduce. Why not: double = map (\\ x -> (x * 2))",
+      "type": "warning"
+    },
+    {
+      "column": 16,
+      "columns": 31,
+      "command": "annotate-code",
+      "row": 1,
+      "rows": 1,
+      "text": "Avoid lambda using `infix`. Why not: (* 2)",
+      "type": "info"
+    },
+    {
+      "column": 23,
+      "columns": 30,
+      "command": "annotate-code",
+      "row": 1,
+      "rows": 1,
+      "text": "Redundant bracket. Why not: \\ x -> x * 2",
+      "type": "info"
+    },
+    {
+      "column": 4,
+      "columns": 18,
+      "command": "annotate-code",
+      "row": 5,
+      "rows": 7,
+      "text": "Redundant if. Why not: x > 0",
+      "type": "warning"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "double"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "double"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double []",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [1, 2, 3]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[2,4,6]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[2,4,6]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [-5]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[-10]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[-10]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}

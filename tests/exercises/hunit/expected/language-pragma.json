@@ -1,0 +1,43 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "\nlib/Input.hs:2:1: warning: [GHC-28007] [-Wmisplaced-pragmas]\n    Misplaced LANGUAGE pragma\n    Suggested fix:\n      Perhaps you meant to place it in the module header?\n      The module header is the section at the top of the file, before the ‘module’ keyword\n  |\n2 | {-# LANGUAGE LambdaCase #-}\n  | ^^^^^^^^^^^^\n[2 of 4] Compiling Input            ( lib/Input.hs, /dev/shm/TMP/Input.o )\n\nlib/Input.hs:4:11: error: [GHC-51179]\n    Illegal \\case\n    Suggested fix: Perhaps you intended to use LambdaCase\n  |\n4 | double = \\case\n  |           ^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "compilation error",
+        "human": "Compilatie mislukt"
+      }
+    }
+  ],
+  "stderr": ""
+}

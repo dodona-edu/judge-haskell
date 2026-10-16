@@ -1,0 +1,133 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "double"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "double"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double []",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [1, 2, 3]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[2,4,6]"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "[3,4,5]",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [-5]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[-10]"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "[-3]",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}

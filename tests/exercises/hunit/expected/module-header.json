@@ -1,0 +1,52 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "column": 0,
+      "columns": 6,
+      "command": "annotate-code",
+      "row": 0,
+      "rows": 0,
+      "text": "Parse error: on input `module'",
+      "type": "error"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "[2 of 4] Compiling Input            ( lib/Input.hs, /dev/shm/TMP/Input.o )\n\nlib/Input.hs:2:1: error: [GHC-58481] parse error on input ‘module’\n  |\n2 | module Double where\n  | ^^^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "compilation error",
+        "human": "Compilatie mislukt"
+      }
+    }
+  ],
+  "stderr": ""
+}

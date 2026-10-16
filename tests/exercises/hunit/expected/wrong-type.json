@@ -1,0 +1,62 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "double"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "Compilatie",
+        "format": "plain"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "\nsrc/Test.hs:7:42: error: [GHC-83865]\n    • Couldn't match expected type ‘[a1]’ with actual type ‘Int’\n    • In the third argument of ‘isEqual’, namely ‘(double [])’\n      In the second argument of ‘($)’, namely\n        ‘isEqual \"double []\" [] (double [])’\n      In the expression: TestCase $ isEqual \"double []\" [] (double [])\n  |\n7 |     [ TestCase $ isEqual \"double []\" [] (double [])\n  |                                          ^^^^^^^^^\n\nsrc/Test.hs:7:49: error: [GHC-83865]\n    • Couldn't match expected type ‘Int’ with actual type ‘[a0]’\n    • In the first argument of ‘double’, namely ‘[]’\n      In the third argument of ‘isEqual’, namely ‘(double [])’\n      In the second argument of ‘($)’, namely\n        ‘isEqual \"double []\" [] (double [])’\n  |\n7 |     [ TestCase $ isEqual \"double []\" [] (double [])\n  |                                                 ^^\n\nsrc/Test.hs:8:56: error: [GHC-83865]\n    • Couldn't match expected type ‘[a2]’ with actual type ‘Int’\n    • In the third argument of ‘isEqual’, namely ‘(double [1, 2, 3])’\n      In the second argument of ‘($)’, namely\n        ‘isEqual \"double [1, 2, 3]\" [2, 4, 6] (double [1, 2, 3])’\n      In the expression:\n        TestCase $ isEqual \"double [1, 2, 3]\" [2, 4, 6] (double [1, 2, 3])\n  |\n8 |     , TestCase $ isEqual \"double [1, 2, 3]\" [2, 4, 6] (double [1, 2, 3])\n  |                                                        ^^^^^^^^^^^^^^^^\n\nsrc/Test.hs:8:63: error: [GHC-83865]\n    • Couldn't match expected type ‘Int’ with actual type ‘[a3]’\n    • In the first argument of ‘double’, namely ‘[1, 2, 3]’\n      In the third argument of ‘isEqual’, namely ‘(double [1, 2, 3])’\n      In the second argument of ‘($)’, namely\n        ‘isEqual \"double [1, 2, 3]\" [2, 4, 6] (double [1, 2, 3])’\n  |\n8 |     , TestCase $ isEqual \"double [1, 2, 3]\" [2, 4, 6] (double [1, 2, 3])\n  |                                                               ^^^^^^^^^\n\nsrc/Test.hs:9:47: error: [GHC-83865]\n    • Couldn't match expected type ‘[a4]’ with actual type ‘Int’\n    • In the third argument of ‘isEqual’, namely ‘(double [- 5])’\n      In the second argument of ‘($)’, namely\n        ‘isEqual \"double [-5]\" [- 10] (double [- 5])’\n      In the expression:\n        TestCase $ isEqual \"double [-5]\" [- 10] (double [- 5])\n  |\n9 |     , TestCase $ isEqual \"double [-5]\" [-10] (double [-5])\n  |                                               ^^^^^^^^^^^\n\nsrc/Test.hs:9:54: error: [GHC-83865]\n    • Couldn't match expected type ‘Int’ with actual type ‘[a5]’\n    • In the first argument of ‘double’, namely ‘[- 5]’\n      In the third argument of ‘isEqual’, namely ‘(double [- 5])’\n      In the second argument of ‘($)’, namely\n        ‘isEqual \"double [-5]\" [- 10] (double [- 5])’\n  |\n9 |     , TestCase $ isEqual \"double [-5]\" [-10] (double [-5])\n  |                                                      ^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "internal error",
+        "human": "Testcompilatie gefaald"
+      }
+    }
+  ],
+  "stderr": ""
+}

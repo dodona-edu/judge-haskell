@@ -1,0 +1,307 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "arithmetic"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "arithmetic"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "half 7",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "3"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "3",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "half -3",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "-2"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "-1",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "power 2 0",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "1"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "0",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "power 2 2",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "4"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "4",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "power 3 0",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "1"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "0",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "power 3 2",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "9"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "6",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "-1 |+| 2",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "3"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "1",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "clamp 0 10 -5",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "0"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "10",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "clamp 0 10 15",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "10"
+    },
+    {
+      "accepted": false,
+      "command": "close-test",
+      "generated": "0",
+      "status": {
+        "enum": "wrong",
+        "human": "Fout antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
+    }
+  ],
+  "stderr": ""
+}
