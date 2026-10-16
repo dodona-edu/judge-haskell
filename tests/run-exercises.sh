@@ -24,7 +24,7 @@ done
 is_ignored() { # $1 = top-level entry of the repo
     local name pattern
     name="$(basename "$1")"
-    case "$name" in .git|.claude) return 0 ;; esac
+    case "$name" in .git|.claude|.ghc.environment.*|dist-newstyle) return 0 ;; esac
     for pattern in "${ignored[@]}"; do
         [ "$pattern" = "/$name" ] && return 0
         [ "$pattern" = "/$name/" ] && [ -d "$1" ] && return 0

@@ -1,6 +1,6 @@
 # Paths Dodona leaves out when syncing this repository to the judge's files
 # directory, which is copied into the sandbox for every submission. Only
-# run, dodona, lib/ and src/ (run compiles lib/*.hs and src/Test.hs with ghc directly; the cabal file is only used for local builds) are read at judging time.
+# run, dodona, lib/ and src/ are read at judging time.
 # Patterns are rsync exclude patterns, anchored to the repository root.
 # See https://github.com/dodona-edu/dodona/issues/8763
 
@@ -10,3 +10,9 @@
 /README.md
 /.gitignore
 /hjudge.cabal
+/packages.txt
+/packages-test.txt
+/packages-dev.txt
+/.tool-versions
+# hlint reads it from the working directory, so in the sandbox it would apply to submissions
+/.hlint.yaml
