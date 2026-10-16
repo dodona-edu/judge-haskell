@@ -1,0 +1,62 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "count"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "Compilatie",
+        "format": "plain"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "src/Test.hs:3:1: error: [GHC-87110]\n    Could not find module ‘Helper’.\n    Use -v to see a list of the files searched for.\n  |\n3 | import qualified Helper as H\n  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "internal error",
+        "human": "Testcompilatie gefaald"
+      }
+    }
+  ],
+  "stderr": ""
+}

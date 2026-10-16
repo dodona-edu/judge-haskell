@@ -14,6 +14,8 @@ tests/exercises/<exercise>/
   expected/<case>.json     exit code, stderr and feedback of the judge
 ```
 
+A case may have `expected/<case>.ghc-<major.minor>.json` for one GHC version, used instead of the default when the image runs that version. It exists while the published image and a candidate run different GHC versions, and is folded into the default once the new image is published.
+
 `tests/run-exercises.sh` runs the judge on every submission the way Dodona does
 and diffs the result with the expected file. Run it inside the judge image:
 
