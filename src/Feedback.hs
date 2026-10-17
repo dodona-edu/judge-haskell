@@ -33,6 +33,7 @@ data Command
   | CloseContext (Maybe Bool)             -- accepted
   | CloseTab
   | CloseJudgement (Maybe Bool) (Maybe Status) -- accepted
+  | AnnotateCode Text Int Int Int Int Text -- type, row, column, rows, columns, text
   deriving (Eq, Show)
 
 data Message = Message Format Text (Maybe Permission) deriving (Eq, Show)
@@ -55,6 +56,10 @@ instance ToJSON Command where
   toJSON CloseTab = command "close-tab" []
   toJSON (CloseJudgement accepted status) =
     command "close-judgement" (maybeField "accepted" accepted ++ maybeField "status" status)
+
+  toJSON (AnnotateCode kind row column rows columns text) =
+    command "annotate-code"
+      ["type" .= kind, "row" .= row, "column" .= column, "rows" .= rows, "columns" .= columns, "text" .= text]
 
 instance ToJSON Message where
   toJSON (Message format description permission) =
