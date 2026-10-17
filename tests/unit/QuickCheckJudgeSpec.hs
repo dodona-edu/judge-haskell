@@ -57,7 +57,7 @@ spec = do
 
     it "words a wrong status as HUnitJudge does" $ do
       quickCheck <- captureCommands (executeTestCase (TestCase "always false" alwaysFalse))
-      hunit <- captureCommands (ignoringFailure (HUnitJudge.isEqual "always false" True False))
+      hunit <- captureCommands (HUnitJudge.isEqual "always false" True False)
       knownBug "#31 Dutch/English mix" $
         statusOf quickCheck `shouldBe` statusOf hunit
 

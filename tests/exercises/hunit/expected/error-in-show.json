@@ -52,7 +52,7 @@
     {
       "accepted": false,
       "command": "close-test",
-      "generated": "\"/mnt/SANDBOX/judge/lib/Input.hs:3:1-29: Non-exhaustive patterns in function double\\n\"",
+      "generated": "/mnt/SANDBOX/judge/lib/Input.hs:3:1-29: Non-exhaustive patterns in function double\n",
       "status": {
         "enum": "runtime error",
         "human": "Fout tijdens uitvoering"
@@ -81,7 +81,7 @@
     {
       "accepted": false,
       "command": "close-test",
-      "generated": "\"/mnt/SANDBOX/judge/lib/Input.hs:3:1-29: Non-exhaustive patterns in function double\\n\"",
+      "generated": "/mnt/SANDBOX/judge/lib/Input.hs:3:1-29: Non-exhaustive patterns in function double\n",
       "status": {
         "enum": "runtime error",
         "human": "Fout tijdens uitvoering"
@@ -110,7 +110,7 @@
     {
       "accepted": false,
       "command": "close-test",
-      "generated": "\"/mnt/SANDBOX/judge/lib/Input.hs:3:1-29: Non-exhaustive patterns in function double\\n\"",
+      "generated": "/mnt/SANDBOX/judge/lib/Input.hs:3:1-29: Non-exhaustive patterns in function double\n",
       "status": {
         "enum": "runtime error",
         "human": "Fout tijdens uitvoering"
