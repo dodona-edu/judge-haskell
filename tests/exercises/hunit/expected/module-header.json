@@ -28,7 +28,7 @@
     {
       "command": "append-message",
       "message": {
-        "description": "[2 of 4] Compiling Input            ( lib/Input.hs, /dev/shm/TMP/Input.o )\nlib/Input.hs:2:1: error: [GHC-58481] parse error on input ‘module’\n  |\n2 | module Double where\n  | ^^^^^^",
+        "description": "[1 of 5] Compiling Input            ( lib/Input.hs, /dev/shm/TMP/Input.o )\nlib/Input.hs:2:1: error: [GHC-58481] parse error on input ‘module’\n  |\n2 | module Double where\n  | ^^^^^^",
         "format": "code"
       }
     },

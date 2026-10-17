@@ -2,10 +2,12 @@
 
 module ConfigSpec (spec) where
 
+import qualified Data.ByteString.Char8 as BC
 import           Data.Either (isLeft)
 import           Test.Hspec
 
 import           Config
+import           JudgeMessages (Language (..))
 
 spec :: Spec
 spec = do
@@ -16,7 +18,17 @@ spec = do
                   \ \"resources\": \"/mnt/resources\", \"source\": \"/mnt/submission/source\",\
                   \ \"workdir\": \"/home/runner/workdir\"}"
         `shouldBe` Right Config { resources = "/mnt/resources", judge = "/mnt/judge"
-                                , workdir = "/home/runner/workdir", source = "/mnt/submission/source" }
+                                , workdir = "/home/runner/workdir", source = "/mnt/submission/source"
+                                , naturalLanguage = Dutch }
+
+    it "reads natural_language en as English" $
+      naturalLanguage <$> parseConfig (paths ", \"natural_language\": \"en\"") `shouldBe` Right English
+
+    it "falls back to English for another natural_language" $
+      naturalLanguage <$> parseConfig (paths ", \"natural_language\": \"fr\"") `shouldBe` Right English
+
+    it "falls back to English without natural_language" $
+      naturalLanguage <$> parseConfig (paths "") `shouldBe` Right English
 
     it "fails when a path is missing" $
       parseConfig "{\"judge\": \"/mnt/judge\", \"resources\": \"/mnt/resources\", \"workdir\": \"/w\"}"
@@ -69,3 +81,7 @@ spec = do
 
     it "matches names case-sensitively" $
       isResourceModule "Typecheck.hs" `shouldBe` True
+
+-- | A config with every path, followed by the given extra keys.
+paths :: String -> BC.ByteString
+paths extra = BC.pack ("{\"judge\": \"/j\", \"resources\": \"/r\", \"source\": \"/s\", \"workdir\": \"/w\"" ++ extra ++ "}")
