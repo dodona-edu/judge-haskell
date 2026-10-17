@@ -25,37 +25,49 @@
     {
       "command": "start-tab",
       "hidden": true,
-      "permission": "staff",
       "title": "count"
     },
     {
-      "command": "start-context",
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "count"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
       "description": {
-        "description": "Compilatie",
-        "format": "plain"
+        "description": "countWords \"a b c\"",
+        "format": "haskell"
       }
     },
     {
-      "command": "append-message",
-      "message": {
-        "description": "src/Test.hs:3:1: error: [GHC-87110]\n    Could not find module ‘Helper’.\n    Use -v to see a list of the files searched for.\n  |\n3 | import qualified Helper as H\n  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        "format": "code"
+      "command": "start-test",
+      "expected": "3"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "3",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
       }
     },
     {
-      "accepted": false,
+      "command": "close-testcase"
+    },
+    {
       "command": "close-context"
     },
     {
       "command": "close-tab"
     },
     {
-      "accepted": false,
-      "command": "close-judgement",
-      "status": {
-        "enum": "internal error",
-        "human": "Testcompilatie gefaald"
-      }
+      "command": "close-judgement"
     }
   ],
   "stderr": ""

@@ -33,7 +33,6 @@
     {
       "command": "start-tab",
       "hidden": true,
-      "permission": "staff",
       "title": "word count"
     },
     {
@@ -107,7 +106,6 @@
     {
       "command": "start-tab",
       "hidden": true,
-      "permission": "staff",
       "title": "longest"
     },
     {

@@ -99,15 +99,15 @@ for testfile in $(cat "$order"); do
     testname="${testbase%_test.hs}"
     tabtitle="$(echo "$testname" | tr '_' ' ')"
 
-    # Compiling the test
-    dodona start-tab -p staff -h -t "$tabtitle"
+    # Compiling the test; --make builds the resource modules in lib/ on demand
+    dodona start-tab -h -t "$tabtitle"
     cp "$testfile" src/Test.hs
-    if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" -c src/Test.hs > "$compilation" 2>&1; then
+    if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" -ilib --make -no-link -v0 src/Test.hs > "$compilation" 2>&1; then
         dodona start-context -f plain -d 'Compilatie'
         dodona append-message -f code -d "$(cat "$compilation")"
         dodona close-context -A
         dodona close-tab
-        dodona close-judgement -A -e 'internal error' -h 'Testcompilatie gefaald'
+        dodona close-judgement -A -e 'compilation error' -h 'Interface niet voldaan'
         exit 0
     fi
     dodona close-tab
