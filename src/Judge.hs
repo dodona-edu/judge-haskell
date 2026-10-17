@@ -4,7 +4,7 @@
 -- Started by run with the cabal store's package db as argument and Dodona's config on stdin.
 
 import           Control.Exception     (finally)
-import           Control.Monad         (forM_, unless, void, when)
+import           Control.Monad         (forM_, unless, when)
 import qualified Data.ByteString       as BS
 import           Data.List             (isPrefixOf, isSuffixOf, sort)
 import           Data.Text             (Text)
@@ -18,6 +18,7 @@ import           System.Process
 import           Config
 import           Feedback
 import           JudgeMessages         (JudgeMessage (..), languageCode, languageVariable, translate)
+import           Lint
 
 main :: IO ()
 main = do
@@ -50,8 +51,7 @@ judgeSubmission config pkgdb builddir = do
   BS.writeFile "lib/Input.hs" . ("module Input where\n" <>) =<< BS.readFile (source config)
 
   -- Lint the user code.
-  void (waitForProcess =<< spawnProcess "runghc"
-    ["-package-db", "--ghc-arg=" ++ pkgdb, "src/JSONLinter.hs", "lib/Input.hs"])
+  mapM_ write =<< lint
 
   -- Compiling the user code.
   write (StartTab (text CompilationTab) True Nothing)
@@ -118,6 +118,17 @@ judgeSubmission config pkgdb builddir = do
       write CloseTab
 
   write (CloseJudgement Nothing Nothing)
+
+-- | The annotations for lib/Input.hs from hlint, which exits non-zero when it finds hints.
+-- Run by path because the runner's PATH lists root's directories only.
+lint :: IO [Command]
+lint = do
+  home <- getHomeDirectory
+  (_, Just out, _, process) <- createProcess
+    (proc (home </> ".local/bin/hlint") ["--json", "--quiet", "lib/Input.hs"]) { std_out = CreatePipe }
+  output <- BS.hGetContents out
+  _ <- waitForProcess process
+  pure (either (const []) (map annotation) (parseIdeas output))
 
 -- | Runs ghc; when it fails, writes the commands for its output and ends the judgement.
 compileOr :: (Text -> [Command]) -> [String] -> IO ()
