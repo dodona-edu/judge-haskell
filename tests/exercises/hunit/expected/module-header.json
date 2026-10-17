@@ -5,15 +5,6 @@
       "command": "start-judgement"
     },
     {
-      "column": 0,
-      "columns": 6,
-      "command": "annotate-code",
-      "row": 0,
-      "rows": 0,
-      "text": "Parse error: on input `module'",
-      "type": "error"
-    },
-    {
       "command": "start-tab",
       "hidden": true,
       "title": "compilatie"
@@ -21,31 +12,121 @@
     {
       "command": "start-context",
       "description": {
-        "description": "ghc Input.hs",
+        "description": "ghc submission.hs",
         "format": "code"
       }
     },
     {
-      "command": "append-message",
-      "message": {
-        "description": "[2 of 4] Compiling Input            ( lib/Input.hs, /dev/shm/TMP/Input.o )\nlib/Input.hs:2:1: error: [GHC-58481] parse error on input ‘module’\n  |\n2 | module Double where\n  | ^^^^^^",
-        "format": "code"
-      }
-    },
-    {
-      "accepted": false,
       "command": "close-context"
     },
     {
       "command": "close-tab"
     },
     {
-      "accepted": false,
-      "command": "close-judgement",
-      "status": {
-        "enum": "compilation error",
-        "human": "Compilatie mislukt"
+      "command": "start-tab",
+      "hidden": true,
+      "permission": "staff",
+      "title": "double"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "title": "double"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double []",
+        "format": "haskell"
       }
+    },
+    {
+      "command": "start-test",
+      "expected": "[]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [1, 2, 3]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[2,4,6]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[2,4,6]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double [-5]",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[-10]"
+    },
+    {
+      "accepted": true,
+      "command": "close-test",
+      "generated": "[-10]",
+      "status": {
+        "enum": "correct",
+        "human": "Juist antwoord"
+      }
+    },
+    {
+      "command": "close-testcase"
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "close-judgement"
     }
   ],
   "stderr": ""

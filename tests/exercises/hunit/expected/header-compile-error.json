@@ -1,0 +1,43 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc submission.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "submission.hs:9:33: error: [GHC-88464]\n    Variable not in scope: (+++) :: [Int] -> [a0] -> [Int]\n    Suggested fix: Perhaps use ‘++’ (imported from Prelude)\n  |\n9 |     (x:xs) -> 2 * x : double xs +++ []\n  |                                 ^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "compilation error",
+        "human": "Compilatie mislukt"
+      }
+    }
+  ],
+  "stderr": ""
+}

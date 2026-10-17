@@ -12,7 +12,7 @@
     {
       "command": "start-context",
       "description": {
-        "description": "ghc Input.hs",
+        "description": "ghc submission.hs",
         "format": "code"
       }
     },
