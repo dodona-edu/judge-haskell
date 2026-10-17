@@ -25,7 +25,6 @@
     {
       "command": "start-tab",
       "hidden": true,
-      "permission": "staff",
       "title": "picture"
     },
     {

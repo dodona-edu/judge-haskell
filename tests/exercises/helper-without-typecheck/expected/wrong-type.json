@@ -1,0 +1,61 @@
+{
+  "exit_code": 0,
+  "feedback": [
+    {
+      "command": "start-judgement"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "compilatie"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "ghc Input.hs",
+        "format": "code"
+      }
+    },
+    {
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "command": "start-tab",
+      "hidden": true,
+      "title": "count"
+    },
+    {
+      "command": "start-context",
+      "description": {
+        "description": "Compilatie",
+        "format": "plain"
+      }
+    },
+    {
+      "command": "append-message",
+      "message": {
+        "description": "src/Test.hs:7:84: error: [GHC-83865]\n    • Couldn't match expected type ‘Int’ with actual type ‘Integer’\n    • In the third argument of ‘isEqual’, namely ‘(countWords \"a b c\")’\n      In the second argument of ‘($)’, namely\n        ‘isEqual\n           \"countWords \\\"a b c\\\"\" (H.countWords \"a b c\") (countWords \"a b c\")’\n      In the expression:\n        TestCase\n          $ isEqual\n              \"countWords \\\"a b c\\\"\" (H.countWords \"a b c\") (countWords \"a b c\")\n  |\n7 | main = runJSON [ TestCase $ isEqual \"countWords \\\"a b c\\\"\" (H.countWords \"a b c\") (countWords \"a b c\") ]\n  |                                                                                    ^^^^^^^^^^^^^^^^^^",
+        "format": "code"
+      }
+    },
+    {
+      "accepted": false,
+      "command": "close-context"
+    },
+    {
+      "command": "close-tab"
+    },
+    {
+      "accepted": false,
+      "command": "close-judgement",
+      "status": {
+        "enum": "compilation error",
+        "human": "Interface niet voldaan"
+      }
+    }
+  ],
+  "stderr": ""
+}

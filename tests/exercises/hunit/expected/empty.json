@@ -25,7 +25,6 @@
     {
       "command": "start-tab",
       "hidden": true,
-      "permission": "staff",
       "title": "double"
     },
     {
@@ -53,8 +52,8 @@
       "accepted": false,
       "command": "close-judgement",
       "status": {
-        "enum": "internal error",
-        "human": "Testcompilatie gefaald"
+        "enum": "compilation error",
+        "human": "Interface niet voldaan"
       }
     }
   ],

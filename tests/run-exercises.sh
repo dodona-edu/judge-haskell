@@ -48,8 +48,8 @@ normalisations=(
     # QuickCheck draws random values, so the number of tries and shrinks varies
     -e 's/after [0-9]+ tests?( and [0-9]+ shrinks?)?/after N tests and M shrinks/g'
     # the GHC runtime under amd64 emulation (Docker on arm64) reports interrupted timers
-    -e '/^[a-z]+: Ticker: poll failed: /d'
-    -e 's/[a-z]+: Ticker: poll failed: Interrupted system call: Interrupted system call\\n//g'
+    -e '/^[a-z0-9.-]+: Ticker: poll failed: /d'
+    -e 's/[a-z0-9.-]+: Ticker: poll failed: Interrupted system call: Interrupted system call\\n//g'
 )
 
 run_case() { # $1 = exercise dir, $2 = case name, $3 = file to write the result to
