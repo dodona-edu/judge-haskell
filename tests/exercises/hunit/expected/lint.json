@@ -15,7 +15,7 @@
     },
     {
       "column": 16,
-      "columns": 31,
+      "columns": 15,
       "command": "annotate-code",
       "row": 1,
       "rows": 1,
@@ -24,7 +24,7 @@
     },
     {
       "column": 23,
-      "columns": 30,
+      "columns": 7,
       "command": "annotate-code",
       "row": 1,
       "rows": 1,
@@ -36,7 +36,7 @@
       "columns": 18,
       "command": "annotate-code",
       "row": 5,
-      "rows": 7,
+      "rows": 3,
       "text": "Redundant if. Why not: x > 0",
       "type": "warning"
     },
@@ -48,7 +48,7 @@
     {
       "command": "start-context",
       "description": {
-        "description": "ghc Input.hs",
+        "description": "ghc submission.hs",
         "format": "code"
       }
     },

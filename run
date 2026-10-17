@@ -45,18 +45,34 @@ if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2
     exit 0
 fi
 
-# Create the Input.hs module, containing the submitted code
-echo 'module Input where' > lib/Input.hs
-cat "$(jq -r '.source' < "$config")" >> lib/Input.hs
+# Create the Input.hs module, containing the submitted code: its leading pragmas
+# and comments, the module line, then the rest without its own module header.
+source="$(jq -r '.source' < "$config")"
+awk '
+    open                       { print; if (index($0, "-}")) open = 0; next }
+    !body && /^[ \t\r]*\{-/    { print; rest = $0; sub(/^[ \t\r]*\{-/, "", rest); open = !index(rest, "-}"); next }
+    !body && /^[ \t\r]*(--|$)/ { print; next }
+    !body {
+        print "module Input where"
+        print "{-# LINE " NR " \"submission.hs\" #-}"
+        body = 1
+        header = /^module([ \t\r]|$)/
+    }
+    header { print ""; header = !/(^|[^A-Za-z0-9_'\''])where([^A-Za-z0-9_'\'']|$)/; next }
+    { print }
+    END { if (!body) print "module Input where" }
+' "$source" > lib/Input.hs
+# GHC quotes the source lines in its messages from the file named in the LINE pragma.
+cp "$source" submission.hs
 cp "$(jq -r '.helper' < "$config")" .  2>/dev/null
 
 # Lint the user code.
-runghc -package-db --ghc-arg="$pkgdb" src/JSONLinter.hs lib/Input.hs
+runghc -package-db --ghc-arg="$pkgdb" src/JSONLinter.hs "$source"
 
 # Compiling the user code.
 dodona start-tab -h -t 'compilatie'
-dodona start-context -f code -d "ghc Input.hs"
-if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
+dodona start-context -f code -d "ghc submission.hs"
+if ! ghc -v0 -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
     dodona append-message -f code -d "$(cat "$compilation")"
     dodona close-context -A
     dodona close-tab
