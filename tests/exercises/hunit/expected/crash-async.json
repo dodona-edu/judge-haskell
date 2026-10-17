@@ -34,7 +34,21 @@
     {
       "command": "start-tab",
       "title": "double"
+    },
+    {
+      "command": "start-context"
+    },
+    {
+      "command": "start-testcase",
+      "description": {
+        "description": "double []",
+        "format": "haskell"
+      }
+    },
+    {
+      "command": "start-test",
+      "expected": "[]"
     }
   ],
-  "stderr": "Test.hs: stack overflow\n"
+  "stderr": "Test.hs: Uncaught exception ghc-internal:GHC.Internal.Exception.ErrorCall:\n\nstack overflow\n\nWhile handling stack overflow\n\nHasCallStack backtrace:\n  collectExceptionAnnotation, called at libraries/ghc-internal/src/GHC/Internal/Exception.hs:170:37 in ghc-internal:GHC.Internal.Exception\n  toExceptionWithBacktrace, called at libraries/ghc-internal/src/GHC/Internal/Exception.hs:90:42 in ghc-internal:GHC.Internal.Exception\n  throw, called at src/Test/HUnit/Lang.hs:102:25 in HUnit-1.6.2.0-4db1aa613b864bde6138b5eddc15ac18cbf24fbda682592d24ce7c1c659724a8:Test.HUnit.Lang\n\n"
 }
