@@ -17,7 +17,7 @@ judge="$(jq -r '.judge' < "$config")"
 workdir="$(jq -r '.workdir' < "$config")"
 builddir="$(mktemp -d -p /dev/shm)"
 
-trap "rm -rf '$config' '$order' '$compilation' '$execution' '$builddir'" EXIT
+trap "rm -rf '$config' '$order' '$compilation' '$builddir'" EXIT
 
 # Searching the environment
 pkgdb="$(find "$HOME/.local/state/cabal/store" -name package.db -print -quit)"
@@ -25,10 +25,6 @@ pkgdb="$(find "$HOME/.local/state/cabal/store" -name package.db -print -quit)"
 # ==============================================================================
 # Helper functions for JSON generation
 dodona() { "$judge/dodona" "$@"; }
-
-append_message() {
-    dodona append-message -f "$1" -p "$2" -d "$3"
-}
 
 # ==============================================================================
 # Compiling and running tests.
@@ -48,7 +44,6 @@ fi
 # Create the Input.hs module, containing the submitted code
 echo 'module Input where' > lib/Input.hs
 cat "$(jq -r '.source' < "$config")" >> lib/Input.hs
-cp "$(jq -r '.helper' < "$config")" .  2>/dev/null
 
 # Lint the user code.
 runghc -package-db --ghc-arg="$pkgdb" src/JSONLinter.hs lib/Input.hs
