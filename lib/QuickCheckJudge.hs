@@ -11,6 +11,8 @@ import           Test.QuickCheck.Arbitrary (Arbitrary)
 import           Test.QuickCheck.Test      (Args (..), Result, isSuccess,
                                             output, quickCheckWithResult)
 
+import           JudgeMessages             (JudgeMessage (..), currentLanguage, translate)
+
 -- A testcase consists of a description together with a property to be tested
 data TestCase a = TestCase
   { description :: String    -- Description of the Test case
@@ -47,8 +49,9 @@ checkResult result = CheckedResult (isSuccess result) (output result)
 
 executeTestCase :: (Arbitrary a, Show a) => TestCase a -> IO ()
 executeTestCase (TestCase d p) = writeTestCase =<< checkResult <$> quickCheckWithResult judgeArgs p
-  where writeTestCase result =
-            mapM_ (writeJSON . object)
+  where writeTestCase result = do
+          lang <- currentLanguage
+          mapM_ (writeJSON . object)
                 [ [ "command" .== "start-context" ]
                 , [ "command" .== "start-testcase"
                   , "description" .= object [ "format" .== "haskell"
@@ -60,8 +63,8 @@ executeTestCase (TestCase d p) = writeTestCase =<< checkResult <$> quickCheckWit
                   , "accepted" .= accepted result ]
                 , [ "command" .== "escalate-status"
                   , "status" .= object (if accepted result
-                    then [ "human" .== "Correct", "enum" .== "correct" ]
-                    else [ "human" .== "Wrong",   "enum" .== "wrong" ]) ]
+                    then [ "human" .== translate lang Correct, "enum" .== "correct" ]
+                    else [ "human" .== translate lang Wrong,   "enum" .== "wrong" ]) ]
                 , [ "command" .== "close-context" ]
                 ]
 

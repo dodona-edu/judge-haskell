@@ -9,7 +9,7 @@ import qualified Data.ByteString       as BS
 import           Data.List             (isPrefixOf, isSuffixOf, sort)
 import           Data.Text             (Text)
 import           System.Directory
-import           System.Environment    (getArgs)
+import           System.Environment    (getArgs, setEnv)
 import           System.Exit
 import           System.FilePath       (takeFileName, (</>))
 import           System.IO             (hClose, openBinaryTempFile)
@@ -17,6 +17,7 @@ import           System.Process
 
 import           Config
 import           Feedback
+import           JudgeMessages         (JudgeMessage (..), languageCode, languageVariable, translate)
 
 main :: IO ()
 main = do
@@ -30,6 +31,9 @@ main = do
 
 judgeSubmission :: Config -> FilePath -> FilePath -> IO ()
 judgeSubmission config pkgdb builddir = do
+  let text = translate (naturalLanguage config)
+  setEnv languageVariable (languageCode (naturalLanguage config))
+
   -- Let's get started
   write StartJudgement
 
@@ -39,7 +43,7 @@ judgeSubmission config pkgdb builddir = do
   compileOr
     (\output ->
       [ AppendMessage (Message Code output (Just Staff))
-      , CloseJudgement (Just False) (Just (Status InternalError "Compilatie judge mislukt")) ])
+      , CloseJudgement (Just False) (Just (Status InternalError (text JudgeCompilationFailed))) ])
     (["-outputdir", builddir, "-package-db", pkgdb] ++ judgeModules)
 
   -- Create the Input.hs module, containing the submitted code
@@ -50,7 +54,7 @@ judgeSubmission config pkgdb builddir = do
     ["-package-db", "--ghc-arg=" ++ pkgdb, "src/JSONLinter.hs", "lib/Input.hs"])
 
   -- Compiling the user code.
-  write (StartTab "compilatie" True Nothing)
+  write (StartTab (text CompilationTab) True Nothing)
   write (StartContext (Just (Message Code "ghc Input.hs" Nothing)))
   submissionModules <- libModules
   compileOr
@@ -58,7 +62,7 @@ judgeSubmission config pkgdb builddir = do
       [ AppendMessage (Message Code output Nothing)
       , CloseContext (Just False)
       , CloseTab
-      , CloseJudgement (Just False) (Just (Status CompilationError "Compilatie mislukt")) ])
+      , CloseJudgement (Just False) (Just (Status CompilationError (text CompilationFailed))) ])
     (["-outputdir", builddir, "-package-db", pkgdb] ++ submissionModules)
   write (CloseContext Nothing)
   write CloseTab
@@ -76,11 +80,11 @@ judgeSubmission config pkgdb builddir = do
     typecheckModules <- libModules
     compileOr
       (\output ->
-        [ StartContext (Just (Message Plain "Compilatie" Nothing))
+        [ StartContext (Just (Message Plain (text CompilationContext) Nothing))
         , AppendMessage (Message Code output Nothing)
         , CloseContext (Just False)
         , CloseTab
-        , CloseJudgement (Just False) (Just (Status CompilationError "Interface niet voldaan")) ])
+        , CloseJudgement (Just False) (Just (Status CompilationError (text InterfaceNotSatisfied))) ])
       (["-i" ++ builddir, "-outputdir", builddir, "-package-db", pkgdb] ++ typecheckModules)
     write CloseTab
 
@@ -94,11 +98,11 @@ judgeSubmission config pkgdb builddir = do
       copyFile testFile "src/Test.hs"
       compileOr
         (\output ->
-          [ StartContext (Just (Message Plain "Compilatie" Nothing))
+          [ StartContext (Just (Message Plain (text CompilationContext) Nothing))
           , AppendMessage (Message Code output Nothing)
           , CloseContext (Just False)
           , CloseTab
-          , CloseJudgement (Just False) (Just (Status InternalError "Testcompilatie gefaald")) ])
+          , CloseJudgement (Just False) (Just (Status InternalError (text TestCompilationFailed))) ])
         ["-i" ++ builddir, "-outputdir", builddir, "-package-db", pkgdb, "-c", "src/Test.hs"]
       write CloseTab
 
