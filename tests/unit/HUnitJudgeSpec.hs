@@ -38,6 +38,11 @@ spec = do
       commands <- captureCommands (isEqual "reverse \"ab\"" "ba" "ba")
       commands `shouldBe` passing "reverse \"ab\"" "\"ba\"" "\"ba\""
 
+    it "words the statuses in Dutch when the driver sets nl" $ do
+      correct <- withLanguage "nl" (captureCommands (isEqual "double 2" (4 :: Int) 4))
+      wrong <- withLanguage "nl" (captureCommands (ignoringFailure (isEqual "double 2" (4 :: Int) 5)))
+      fieldsOf "close-test" ["status", "human"] (correct ++ wrong) `shouldBe` ["Juist antwoord", "Fout antwoord"]
+
     it "writes the description as given, non-ASCII included" $ do
       commands <- captureCommands (isEqual "lengte \"café\"" (4 :: Int) 4)
       fieldsOf "start-testcase" ["description", "description"] commands `shouldBe` ["lengte \"café\""]
@@ -79,6 +84,10 @@ spec = do
       commands <- captureCommands (runJSON [TestCase (ioError (userError "boom"))])
       commands `shouldBe` runtimeError "\"user error (boom)\""
 
+    it "words the runtime error in Dutch when the driver sets nl" $ do
+      commands <- withLanguage "nl" $ captureCommands $ runJSON [TestCase (ioError (userError "boom"))]
+      fieldsOf "close-test" ["status", "human"] commands `shouldBe` ["Fout tijdens uitvoering"]
+
     it "writes nothing for an empty list" $ do
       commands <- captureCommands (runJSON [])
       commands `shouldBe` []
@@ -118,11 +127,11 @@ closeTest generated accepted enum human =
 
 passing :: T.Text -> T.Text -> T.Text -> [Value]
 passing description expected generated =
-  opened description expected ++ [closeTest generated True "correct" "Juist antwoord"] ++ closed
+  opened description expected ++ [closeTest generated True "correct" "Correct"] ++ closed
 
 failing :: T.Text -> T.Text -> T.Text -> [Value]
 failing description expected generated =
-  opened description expected ++ [closeTest generated False "wrong" "Fout antwoord"] ++ closed
+  opened description expected ++ [closeTest generated False "wrong" "Wrong"] ++ closed
 
 runtimeError :: T.Text -> [Value]
-runtimeError generated = closeTest generated False "runtime error" "Fout tijdens uitvoering" : closed
+runtimeError generated = closeTest generated False "runtime error" "Runtime error" : closed

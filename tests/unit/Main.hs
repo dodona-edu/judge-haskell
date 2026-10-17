@@ -4,6 +4,7 @@ import qualified ConfigSpec
 import qualified FeedbackSpec
 import qualified HUnitJudgeSpec
 import qualified JSONLinterSpec
+import qualified JudgeMessagesSpec
 import qualified QuickCheckJudgeSpec
 import qualified UtilsSpec
 
@@ -15,3 +16,4 @@ main = hspec $ do
   describe "JSONLinter" JSONLinterSpec.spec
   describe "Config" ConfigSpec.spec
   describe "Feedback" FeedbackSpec.spec
+  describe "JudgeMessages" JudgeMessagesSpec.spec

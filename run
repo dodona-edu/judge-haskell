@@ -5,9 +5,10 @@
 # -dynamic because linking statically takes far more memory.
 
 pkgdb="$(find "$HOME/.local/state/cabal/store" -name package.db -print -quit)"
-src="$(dirname "$0")/src"
+judge="$(dirname "$0")"
 driver="$(mktemp -d)"
 trap "rm -rf '$driver'" EXIT
 
-ghc -v0 -dynamic -package-db "$pkgdb" -i"$src" -outputdir "$driver" -o "$driver/judge" "$src/Judge.hs" || exit 1
+ghc -v0 -dynamic -package-db "$pkgdb" -i"$judge/src:$judge/lib" -outputdir "$driver" -o "$driver/judge" \
+    "$judge/src/Judge.hs" || exit 1
 "$driver/judge" "$pkgdb"

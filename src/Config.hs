@@ -9,23 +9,27 @@ module Config
   , isResourceModule
   ) where
 
-import           Data.Aeson       (FromJSON (..), eitherDecodeStrict, withObject, (.:))
+import           Data.Aeson       (FromJSON (..), eitherDecodeStrict, withObject, (.:), (.:?))
 import qualified Data.ByteString  as BS
 import           Data.List        (isPrefixOf, isSuffixOf, sort)
 import           System.Directory (doesFileExist, listDirectory)
 import           System.FilePath  ((</>))
 
+import           JudgeMessages    (Language (..), language)
+
 -- | The keys the judge uses from the submission config Dodona sends on stdin.
 data Config = Config
-  { resources :: FilePath
-  , judge     :: FilePath
-  , workdir   :: FilePath
-  , source    :: FilePath
+  { resources       :: FilePath
+  , judge           :: FilePath
+  , workdir         :: FilePath
+  , source          :: FilePath
+  , naturalLanguage :: Language
   } deriving (Eq, Show)
 
 instance FromJSON Config where
   parseJSON = withObject "config" $ \o ->
     Config <$> o .: "resources" <*> o .: "judge" <*> o .: "workdir" <*> o .: "source"
+           <*> (maybe English language <$> o .:? "natural_language")
 
 parseConfig :: BS.ByteString -> Either String Config
 parseConfig = eitherDecodeStrict
