@@ -1,5 +1,7 @@
 import           Test.Hspec
 
+import qualified ConfigSpec
+import qualified FeedbackSpec
 import qualified HUnitJudgeSpec
 import qualified JSONLinterSpec
 import qualified QuickCheckJudgeSpec
@@ -11,3 +13,5 @@ main = hspec $ do
   describe "QuickCheckJudge" QuickCheckJudgeSpec.spec
   describe "Utils" UtilsSpec.spec
   describe "JSONLinter" JSONLinterSpec.spec
+  describe "Config" ConfigSpec.spec
+  describe "Feedback" FeedbackSpec.spec
