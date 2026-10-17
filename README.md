@@ -1,5 +1,7 @@
 # judge-haskell
 
+Dodona starts `run`, which compiles the driver `src/Judge.hs` and runs it with the submission config on stdin. The driver compiles `lib/` with the submission, then compiles and runs each test file, and writes the feedback around what the tests write themselves. Everything in `lib/` is compiled alongside the submission and visible to test files; the driver's own modules stay in `src/`.
+
 ## Testing
 
 `tests/exercises/` holds small exercises, each with student submissions and the
