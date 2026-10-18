@@ -40,7 +40,7 @@ dodona start-judgement
 cd "$judge"
 
 if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-    dodona append-message -f code -p staff -d "$(cat "$compilation")"
+    dodona append-message -f code -p educator -d "$(cat "$compilation")"
     dodona close-judgement -A -e 'internal error' -h 'Compilatie judge mislukt'
     exit 0
 fi
@@ -100,7 +100,7 @@ for testfile in $(cat "$order"); do
     tabtitle="$(echo "$testname" | tr '_' ' ')"
 
     # Compiling the test
-    dodona start-tab -p staff -h -t "$tabtitle"
+    dodona start-tab -p educator -h -t "$tabtitle"
     cp "$testfile" src/Test.hs
     if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" -c src/Test.hs > "$compilation" 2>&1; then
         dodona start-context -f plain -d 'Compilatie'

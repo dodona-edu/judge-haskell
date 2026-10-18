@@ -26,9 +26,9 @@ check_status() {
 
 check_permission() {
 	case "$1" in
-	"staff")   return 0 ;;
-	"student") return 0 ;;
-	"zeus")    return 0 ;;
+	"educator") return 0 ;;
+	"student")  return 0 ;;
+	"zeus")     return 0 ;;
 	*)         crash invalid permission "$1" ;;
 	esac
 }
