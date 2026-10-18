@@ -154,7 +154,7 @@ annotate-code)
 	[ -n "$columns" ] && apply jq ".columns = $columns"
 	;;
 close-test)
-	while getopts g:s:aA f; do
+	while getopts g:e:h:aA f; do
 		case "$f" in
 		g)  generated="$OPTARG" ;;
 		e)  enum="$OPTARG" ;;
