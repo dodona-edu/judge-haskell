@@ -25,7 +25,7 @@
     {
       "command": "start-tab",
       "hidden": true,
-      "permission": "staff",
+      "permission": "educator",
       "title": "double"
     },
     {
