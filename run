@@ -1,120 +1,14 @@
 #!/bin/sh
 
-# ==============================================================================
-# Setup of environment
+# Compiles src/Judge.hs and runs it on Dodona's config from stdin: it judges the submission.
+# Compiled rather than run with runghc, so no interpreter stays resident beside the tests;
+# -dynamic because linking statically takes far more memory.
 
-# Temp files
-config="$(mktemp)"      # configuration
-order="$(mktemp)"       # order
-compilation="$(mktemp)" # output of compilation
-
-# Saving the configuration from stdin
-cat > "$config"
-
-# Directories containing the test files and the judge repository
-resources="$(jq -r '.resources' < "$config")"
-judge="$(jq -r '.judge' < "$config")"
-workdir="$(jq -r '.workdir' < "$config")"
-builddir="$(mktemp -d -p /dev/shm)"
-
-trap "rm -rf '$config' '$order' '$compilation' '$builddir'" EXIT
-
-# Searching the environment
 pkgdb="$(find "$HOME/.local/state/cabal/store" -name package.db -print -quit)"
+judge="$(dirname "$0")"
+driver="$(mktemp -d)"
+trap "rm -rf '$driver'" EXIT
 
-# ==============================================================================
-# Helper functions for JSON generation
-dodona() { "$judge/dodona" "$@"; }
-
-# ==============================================================================
-# Compiling and running tests.
-
-# Let's get started
-dodona start-judgement
-
-# Compiling the judge code
-cd "$judge"
-
-if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-    dodona append-message -f code -p staff -d "$(cat "$compilation")"
-    dodona close-judgement -A -e 'internal error' -h 'Compilatie judge mislukt'
-    exit 0
-fi
-
-# Create the Input.hs module, containing the submitted code
-echo 'module Input where' > lib/Input.hs
-cat "$(jq -r '.source' < "$config")" >> lib/Input.hs
-
-# Lint the user code.
-runghc -package-db --ghc-arg="$pkgdb" src/JSONLinter.hs lib/Input.hs
-
-# Compiling the user code.
-dodona start-tab -h -t 'compilatie'
-dodona start-context -f code -d "ghc Input.hs"
-if ! ghc -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-    dodona append-message -f code -d "$(cat "$compilation")"
-    dodona close-context -A
-    dodona close-tab
-    dodona close-judgement -A -e 'compilation error' -h 'Compilatie mislukt'
-    exit 0
-fi
-dodona close-context
-dodona close-tab
-
-# Copy over non-testfiles
-find "$resources" \
-    -name '*.hs' \
-    -not -name '*_test.hs' \
-    -not -name 'typecheck.hs' \
-    -exec cp \{\} lib \;
-
-if [ -f "$resources/typecheck.hs" ]; then
-    dodona start-tab -h -t 'Typecheck'
-    echo 'module Typecheck where' > lib/Typecheck.hs
-    cat "$resources/typecheck.hs" >> lib/Typecheck.hs
-    if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" lib/*.hs > "$compilation" 2>&1; then
-        dodona start-context -f plain -d 'Compilatie'
-        dodona append-message -f code -d "$(cat "$compilation")"
-        dodona close-context -A
-        dodona close-tab
-        dodona close-judgement -A -e 'compilation error' -h 'Interface niet voldaan'
-        exit 0
-    fi
-    dodona close-tab
-fi
-
-# Compiling and running each test file.
-if [ -f "$resources/ordered_tests" ]
-then sed "s|^|$resources/|" < "$resources/ordered_tests" > "$order"
-else echo "$resources"/*_test.hs > "$order"
-fi
-for testfile in $(cat "$order"); do
-    [ -f "$testfile" ] || continue
-    testbase="$(basename "$testfile")"
-    testname="${testbase%_test.hs}"
-    tabtitle="$(echo "$testname" | tr '_' ' ')"
-
-    # Compiling the test
-    dodona start-tab -p staff -h -t "$tabtitle"
-    cp "$testfile" src/Test.hs
-    if ! ghc -i"$builddir" -outputdir "$builddir" -package-db "$pkgdb" -c src/Test.hs > "$compilation" 2>&1; then
-        dodona start-context -f plain -d 'Compilatie'
-        dodona append-message -f code -d "$(cat "$compilation")"
-        dodona close-context -A
-        dodona close-tab
-        dodona close-judgement -A -e 'internal error' -h 'Testcompilatie gefaald'
-        exit 0
-    fi
-    dodona close-tab
-
-    # Running the test
-    dodona start-tab -t "$tabtitle"
-    set -e
-    cd "$workdir"
-    runghc -w -package-db --ghc-arg="$pkgdb" -i"$builddir":"$judge"/lib "$judge"/src/Test.hs
-    cd "$judge"
-    set +e
-    dodona close-tab
-done
-
-dodona close-judgement
+ghc -v0 -dynamic -package-db "$pkgdb" -i"$judge/src:$judge/lib" -outputdir "$driver" -o "$driver/judge" \
+    "$judge/src/Judge.hs" || exit 1
+"$driver/judge" "$pkgdb"
