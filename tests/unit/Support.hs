@@ -3,10 +3,11 @@
 
 module Support
   ( captureStdout
+  , captureStdoutIn
   , captureCommands
+  , balanced
   , command
   , decodeCommands
-  , ignoringFailure
   , knownBug
   , field
   , fieldsOf
@@ -14,7 +15,6 @@ module Support
   ) where
 
 import           Control.Exception        (finally, try)
-import           Control.Monad            (void)
 import           Data.Aeson               (Value (..), eitherDecodeStrictText, object, (.=))
 import qualified Data.Aeson.Key           as Key
 import qualified Data.Aeson.KeyMap        as KeyMap
@@ -31,7 +31,11 @@ import           Test.HUnit.Lang          (HUnitFailure)
 
 -- | Runs the action with stdout redirected to a UTF-8 temp file, as the image's C.UTF-8 locale would.
 captureStdout :: IO a -> IO (T.Text, a)
-captureStdout action = do
+captureStdout = captureStdoutIn . const
+
+-- | Like captureStdout, passing the action the file's path, to read what reached it before stdout is flushed.
+captureStdoutIn :: (FilePath -> IO a) -> IO (T.Text, a)
+captureStdoutIn action = do
   tmp <- getTemporaryDirectory
   (path, file) <- openTempFile tmp "stdout"
   hSetEncoding file utf8
@@ -40,7 +44,7 @@ captureStdout action = do
   buffering <- hGetBuffering stdout
   hDuplicateTo file stdout
   hClose file
-  result <- action `finally` restore saved buffering
+  result <- action path `finally` restore saved buffering
   output <- withFile path ReadMode (\h -> hSetEncoding h utf8 >> T.hGetContents h)
   removeFile path
   pure (output, result)
@@ -81,9 +85,20 @@ takeObject = go (0 :: Int) False ""
       | otherwise              = go depth False (c : acc) cs
     go _ _ acc []                     = (reverse acc, [])
 
--- | Runs an assertion that is expected to fail, such as isEqual on unequal values, for its output only.
-ignoringFailure :: IO () -> IO ()
-ignoringFailure assertion = void (try assertion :: IO (Either HUnitFailure ()))
+-- | Whether every start-… command is closed by the matching close-…, innermost first, as Dodona requires.
+balanced :: [Value] -> Bool
+balanced = go []
+  where
+    go open (c : cs) = case T.breakOn "-" <$> commandName c of
+      Just ("start", level) -> go (level : open) cs
+      Just ("close", level) -> case open of
+        top : rest | top == level -> go rest cs
+        _                         -> False
+      _ -> go open cs
+    go open [] = null open
+    commandName c = case field ["command"] c of
+      Just (String name) -> Just name
+      _                  -> Nothing
 
 -- | Asserts the intended behaviour for a filed bug: pending while it fails, a failure once it holds.
 knownBug :: String -> Expectation -> Expectation
