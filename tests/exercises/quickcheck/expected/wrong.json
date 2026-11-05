@@ -60,7 +60,7 @@
       "command": "escalate-status",
       "status": {
         "enum": "wrong",
-        "human": "Wrong"
+        "human": "Fout antwoord"
       }
     },
     {
@@ -91,7 +91,7 @@
       "command": "escalate-status",
       "status": {
         "enum": "correct",
-        "human": "Correct"
+        "human": "Juist antwoord"
       }
     },
     {
