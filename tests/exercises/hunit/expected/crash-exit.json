@@ -52,7 +52,7 @@
     {
       "accepted": false,
       "command": "close-test",
-      "generated": "\"ExitFailure 1\"",
+      "generated": "ExitFailure 1",
       "status": {
         "enum": "runtime error",
         "human": "Fout tijdens uitvoering"
@@ -81,7 +81,7 @@
     {
       "accepted": false,
       "command": "close-test",
-      "generated": "\"ExitFailure 1\"",
+      "generated": "ExitFailure 1",
       "status": {
         "enum": "runtime error",
         "human": "Fout tijdens uitvoering"
@@ -110,7 +110,7 @@
     {
       "accepted": false,
       "command": "close-test",
-      "generated": "\"ExitFailure 1\"",
+      "generated": "ExitFailure 1",
       "status": {
         "enum": "runtime error",
         "human": "Fout tijdens uitvoering"
