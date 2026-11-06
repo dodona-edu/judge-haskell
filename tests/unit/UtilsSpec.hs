@@ -49,13 +49,15 @@ spec = do
 
     it "puts a negative argument between parentheses" $ do
       commands <- run (generateTest1 "half" half half [-3])
-      knownBug "#32 descriptions drop parentheses around arguments" $
-        descriptions commands `shouldBe` ["half (-3)"]
+      descriptions commands `shouldBe` ["half (-3)"]
 
     it "puts a constructor application argument between parentheses" $ do
       commands <- run (generateTest1 "fromMaybe0" fromMaybe0 fromMaybe0 [Just 3])
-      knownBug "#32 descriptions drop parentheses around arguments" $
-        descriptions commands `shouldBe` ["fromMaybe0 (Just 3)"]
+      descriptions commands `shouldBe` ["fromMaybe0 (Just 3)"]
+
+    it "leaves a positive argument without parentheses" $ do
+      commands <- run (generateTest1 "half" half half [4])
+      descriptions commands `shouldBe` ["half 4"]
 
   describe "generateTest2" $
     it "describes and runs one test per pair" $ do
@@ -81,6 +83,10 @@ spec = do
       commands <- run (generateInfix "`div`" div' div' [(7, 2), (9, 3)])
       descriptions commands `shouldBe` ["7 `div` 2", "9 `div` 3"]
       generated commands `shouldBe` ["3", "3"]
+
+    it "puts negative operands between parentheses" $ do
+      commands <- run (generateInfix "`div`" div' div' [(-7, -2)])
+      descriptions commands `shouldBe` ["(-7) `div` (-2)"]
 
     it "expects the first function's result and generates the second's" $ do
       commands <- run (generateInfix "-" minus plus [(5, 2)])
