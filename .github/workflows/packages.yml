@@ -7,7 +7,7 @@ jobs:
   packages-match-image:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/dodona-edu/dodona-haskell:latest
+      image: ghcr.io/dodona-edu/dodona-haskell:live
       options: --user root
 
     steps:

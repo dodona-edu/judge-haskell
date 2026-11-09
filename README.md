@@ -14,7 +14,7 @@ tests/exercises/<exercise>/
   expected/<case>.json     exit code, stderr and feedback of the judge
 ```
 
-A case may have `expected/<case>.ghc-<major.minor>.json` for one GHC version, used instead of the default when the image runs that version. It exists while the published image and a candidate run different GHC versions, and is folded into the default once the new image is published.
+A case may have `expected/<case>.ghc-<major.minor>.json` for one GHC version, used instead of the default when the image runs that version. It exists while the live image and a candidate run different GHC versions, and is folded into the default once the new image is live.
 
 `tests/run-exercises.sh` runs the judge on every submission the way Dodona does
 and diffs the result with the expected file. Run it inside the judge image:
@@ -23,13 +23,13 @@ and diffs the result with the expected file. Run it inside the judge image:
 devel/run-tests-in-image.sh                      # all cases
 devel/run-tests-in-image.sh hunit/wrong          # cases whose <exercise>/<case> contains the filter
 UPDATE_EXPECTED=1 devel/run-tests-in-image.sh    # rewrite the expected files
-IMAGE=... devel/run-tests-in-image.sh            # another image than ghcr.io/dodona-edu/dodona-haskell:latest
+IMAGE=... devel/run-tests-in-image.sh            # another image than ghcr.io/dodona-edu/dodona-haskell:live
 ```
 
 Review the changes to `expected/` after an update: they are the judge's
 feedback, bugs included.
 
-CI runs the suite on every push in `ghcr.io/dodona-edu/dodona-haskell:latest`
+CI runs the suite on every push in `ghcr.io/dodona-edu/dodona-haskell:live`
 (`.github/workflows/integration_test.yml`). `.github/workflows/e2e.yml` takes
 the image and judge ref as inputs, so docker-images can verify a new image
 against the suite before publishing it.
