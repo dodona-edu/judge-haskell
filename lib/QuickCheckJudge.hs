@@ -2,11 +2,13 @@
 
 module QuickCheckJudge where
 
-import           Data.Aeson                   (encode, Value, (.=), object)
+import           Data.Aeson                   (Value, (.=), object)
 import           Data.Aeson.Key               (Key, fromText)
-import qualified Data.Text.Lazy.Encoding as T
-import qualified Data.Text.Lazy.IO as T
+import           Data.Aeson.Text              (encodeToLazyText)
+import qualified Data.Text.IO as T
+import qualified Data.Text.Lazy as TL
 import qualified Data.Text as T
+import qualified System.IO as IO
 import           Test.QuickCheck.Arbitrary (Arbitrary)
 import           Test.QuickCheck.Test      (Args (..), Result, isSuccess,
                                             output, quickCheckWithResult)
@@ -36,8 +38,11 @@ judgeArgs = Args
   , maxShrinks      = 100
   }
 
+-- Encoded in full, then flushed: Dodona rejects all output after a cut-off object, and keeps what was written on a timeout.
 writeJSON :: Value -> IO ()
-writeJSON = T.putStr . T.decodeUtf8 . encode
+writeJSON value = do
+    T.putStr $! TL.toStrict (encodeToLazyText value)
+    IO.hFlush IO.stdout
 
 (.==) :: T.Text -> T.Text -> (Key, Value)
 (.==) k = (.=) (fromText k)
