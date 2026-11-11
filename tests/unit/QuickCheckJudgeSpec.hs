@@ -52,14 +52,17 @@ spec = do
     it "words a correct status as HUnitJudge does" $ do
       quickCheck <- captureCommands (executeTestCase (TestCase "reverse keeps the length" keepsLength))
       hunit <- captureCommands (HUnitJudge.isEqual "reverse keeps the length" True True)
-      knownBug "#31 Dutch/English mix" $
-        statusOf quickCheck `shouldBe` statusOf hunit
+      statusOf quickCheck `shouldBe` statusOf hunit
 
     it "words a wrong status as HUnitJudge does" $ do
       quickCheck <- captureCommands (executeTestCase (TestCase "always false" alwaysFalse))
       hunit <- captureCommands (ignoringFailure (HUnitJudge.isEqual "always false" True False))
-      knownBug "#31 Dutch/English mix" $
-        statusOf quickCheck `shouldBe` statusOf hunit
+      statusOf quickCheck `shouldBe` statusOf hunit
+
+    it "words the statuses in Dutch when the driver sets nl" $ do
+      correct <- withLanguage "nl" (captureCommands (executeTestCase (TestCase "reverse keeps the length" keepsLength)))
+      wrong <- withLanguage "nl" (captureCommands (executeTestCase (TestCase "always false" alwaysFalse)))
+      fieldsOf "escalate-status" ["status", "human"] (correct ++ wrong) `shouldBe` ["Juist antwoord", "Fout antwoord"]
 
 keepsLength :: [Int] -> Bool
 keepsLength xs = length (reverse xs) == length xs

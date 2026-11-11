@@ -11,9 +11,10 @@ module Support
   , field
   , fieldsOf
   , statusOf
+  , withLanguage
   ) where
 
-import           Control.Exception        (finally, try)
+import           Control.Exception        (bracket, finally, try)
 import           Control.Monad            (void)
 import           Data.Aeson               (Value (..), eitherDecodeStrictText, object, (.=))
 import qualified Data.Aeson.Key           as Key
@@ -25,9 +26,12 @@ import qualified Data.Text                as T
 import qualified Data.Text.IO             as T
 import           GHC.IO.Handle            (hDuplicate, hDuplicateTo)
 import           System.Directory         (getTemporaryDirectory, removeFile)
+import           System.Environment       (lookupEnv, setEnv, unsetEnv)
 import           System.IO
 import           Test.Hspec
 import           Test.HUnit.Lang          (HUnitFailure)
+
+import           JudgeMessages             (languageVariable)
 
 -- | Runs the action with stdout redirected to a UTF-8 temp file, as the image's C.UTF-8 locale would.
 captureStdout :: IO a -> IO (T.Text, a)
@@ -107,3 +111,9 @@ fieldsOf name path = mapMaybe select
 
 statusOf :: [Value] -> [Value]
 statusOf = mapMaybe (field ["status"])
+
+-- | Runs the action with the language variable set as the driver sets it for a test program.
+withLanguage :: String -> IO a -> IO a
+withLanguage code action = bracket (lookupEnv languageVariable) restore (const (setEnv languageVariable code >> action))
+  where
+    restore = maybe (unsetEnv languageVariable) (setEnv languageVariable)

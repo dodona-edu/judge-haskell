@@ -23,6 +23,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy.Encoding as T
 import qualified Data.Text.Lazy.IO as T
 import qualified System.IO as IO
+import           JudgeMessages (JudgeMessage (..), currentLanguage, translate)
 import           Test.HUnit (PutText(PutText), Assertion, Test(TestList, TestLabel), assertBool, performTest)
 
 --
@@ -47,6 +48,7 @@ writeJSON = T.putStr . T.decodeUtf8 . encode
 
 isEqual :: (Eq a, Show a) => String -> a -> a -> Assertion
 isEqual preface should actual = do
+    lang <- currentLanguage
     writeJSON $ object [ "command" .== "start-context" ]
     writeJSON $ object [ "command" .== "start-testcase"
                        , "description" .= object [ "format" .== "haskell", "description" .= preface ] ]
@@ -56,11 +58,11 @@ isEqual preface should actual = do
     if accepted then writeJSON $ object [ "command" .== "close-test"
                                         , "generated" .= (show actual)
                                         , "accepted" .= True
-                                        , "status" .= object [ "enum" .== "correct", "human" .== "Juist antwoord" ] ]
+                                        , "status" .= object [ "enum" .== "correct", "human" .== translate lang Correct ] ]
                 else writeJSON $ object [ "command" .== "close-test"
                                         , "generated" .= (show actual)
                                         , "accepted" .= False
-                                        , "status" .= object [ "enum" .== "wrong", "human" .== "Fout antwoord" ] ]
+                                        , "status" .= object [ "enum" .== "wrong", "human" .== translate lang Wrong ] ]
     writeJSON $ object [ "command" .== "close-testcase" ]
     writeJSON $ object [ "command" .== "close-context" ]
     assertBool "" accepted
@@ -89,9 +91,10 @@ runTestJSON (PutText put us0) t = do
       -- putStrLn $ show $ path ss
   reportFail loc msg ss count = return ()
   reportError loc msg ss count = do
+      lang <- currentLanguage
       writeJSON $ object [ "command" .== "close-test"
                          , "accepted" .= False
-                         , "status" .= object [ "enum" .== "runtime error", "human" .== "Fout tijdens uitvoering" ]
+                         , "status" .= object [ "enum" .== "runtime error", "human" .== translate lang RuntimeError ]
                          , "generated" .= (show msg) ]
       writeJSON $ object [ "command" .== "close-testcase" ]
       writeJSON $ object [ "command" .== "close-context" ]

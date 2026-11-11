@@ -1,5 +1,9 @@
 # judge-haskell
 
+Dodona starts `run`, which compiles the driver `src/Judge.hs` and runs it with the submission config on stdin. The driver compiles `lib/` with the submission, then compiles and runs each test file, and writes the feedback around what the tests write themselves. Everything in `lib/` is compiled alongside the submission and visible to test files; the driver's own modules stay in `src/`. The driver lints the submission with the `hlint` executable the image installs in the runner's `~/.local/bin` and turns its `--json` output into `annotate-code` commands (`src/Lint.hs`).
+
+The texts the judge shows students are in `lib/JudgeMessages.hs`, in Dutch and English, picked by the config's `natural_language` (English for anything but `nl`). The driver passes the language on to the test programs in `DODONA_NATURAL_LANGUAGE`.
+
 ## Testing
 
 `tests/exercises/` holds small exercises, each with student submissions and the
