@@ -70,7 +70,7 @@
     {
       "command": "start-testcase",
       "description": {
-        "description": "half -3",
+        "description": "half (-3)",
         "format": "haskell"
       }
     },
@@ -215,7 +215,7 @@
     {
       "command": "start-testcase",
       "description": {
-        "description": "-1 |+| 2",
+        "description": "(-1) |+| 2",
         "format": "haskell"
       }
     },
@@ -244,7 +244,7 @@
     {
       "command": "start-testcase",
       "description": {
-        "description": "clamp 0 10 -5",
+        "description": "clamp 0 10 (-5)",
         "format": "haskell"
       }
     },
